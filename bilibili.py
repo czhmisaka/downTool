@@ -186,4 +186,4 @@ class commonThread(threading.Thread):
 
 
 def main():
-    
+    return 0
