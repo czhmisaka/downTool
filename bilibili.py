@@ -97,8 +97,13 @@ class down():
         [{
             path:xxxxxxx,
             url:xxxxxx,
+        },{
+            path:xxxxxxx,
+            url:xxxxxx,
         }]
 
+
+        --变量说明--
         thread
             -List   :线程列表
             -MaxNum :最大线程数量
@@ -107,6 +112,10 @@ class down():
             -Key    :当前已创建下载的任务数量
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
+        lock        :进程锁/目前还没有什么用
+        pool        :下载池/目前还没有什么用
+        log         :错误输出控制
+        --变量说明--
         '''
         self.header = []
         self.threadList = []
@@ -117,23 +126,40 @@ class down():
         self.key_Keep = True 
         self.lock = threading.Lock
         self.pool = []
+        self.log = True
 
     def saveHistory(self,path):
         pass
 
     def pool(self,max):
-        while(self.taskKey<=self.taskNum):
+        while(1):
             if self.key_Keep == False:
-                print('下载已经终止')
+                self.logTag('下载已经终止')
                 return False
-            else:
+            elif self.taskKey<=self.taskNum:
                 while(len(self.threadList)<self.threadMaxNum):
                     deal = self.taskList[int(self.taskKey)]
                     self.threadList.append(commonThread(self.downImage,(deal['url'],deal['path'])))
                     self.threadList[len(self.threadList)].start()
                     self.taskKey = self.taskKey + 1
-                time.sleep(1)
-    
+            elif self.taskKey>self.taskNum
+            
+
+    def addMission(self,url,path):
+        '''
+        加入一个新的任务
+        '''
+        try:
+            self.taskNum = self.taskNum + 1
+            self.taskList.append({
+                'path':path,
+                'url':url
+            })
+        except:
+            self.logTag("error : 添加失败 path:"+path+' url: '+url)
+        else:
+            self.logTag("success :"+"任务添加成功"+"path:"+path+' url: '+url)
+
     def downImage(self,url,path):
         '''
         下载一张图片/需要对应路径
@@ -143,18 +169,18 @@ class down():
             path = self.pathDeal(path)
             pp = requests.get(url,headers = self.header)
             if str(pp) ==  "<Response [404]>":
-                print("Warning 404 : check the url right")
+                self.logTag("Warning 404 : check the url right")
                 return False
             else:
                 path = str(path)
-                print("正在下载 "+url+" 为 "+path)
+                self.logTag("正在下载 "+url+" 为 "+path)
                 with open(path,'wb') as f:
                     for chunk in pp:
                         f.write(chunk)
-                print("第"+path+"张下载好。")
+                self.logTag("第"+path+"张下载好。")
                 return True
         except:
-            print("Error<<downImage()>>self:"+self+"-path:"+path+"-url:"+url)
+            self.logTag("Error<<downImage()>>self:"+self+"-path:"+path+"-url:"+url)
             
 
     def mkdirFile(self,path):
@@ -169,7 +195,7 @@ class down():
             else:
                 return False
         except:
-            print("Error:"+datetime.datetime.now+":mkdirFile:"+path) 
+            self.logTag("Error:"+datetime.datetime.now+":mkdirFile:"+path) 
 
     def checkFile(self,path):
         '''
@@ -183,7 +209,7 @@ class down():
             else:
                 return False
         except:
-            print("Error:"+datetime.datetime.now+":checkFile:"+path)
+            self.logTag("Error:"+datetime.datetime.now+":checkFile:"+path)
 
     def pathDeal(self,path):
         '''
@@ -192,6 +218,14 @@ class down():
         path = path.strip()
         path = path.rstrip()
         return path
+    
+    def logTag(self,log):
+        '''
+        可关闭的输出
+        '''
+        if self.log == True:
+            print(str(log))
+
 
 class commonThread(threading.Thread):
     def __init__(self,func,args,name):
