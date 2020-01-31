@@ -1,6 +1,12 @@
-
-import threading
+import requests
+from bs4 import BeautifulSoup as Bs4
+from selenium import webdriver
 import time
+import threading
+import threadpool
+import datetime
+from fake_useragent import UserAgent
+import os
 
 
 def loop(key):
@@ -18,9 +24,15 @@ class test(threading.Thread):
         print(self.name+'号线程已经启动')
         self.func(*self.args)
 
-lista = []
-for i in range(3):
-    lista.append(test(loop,[10],str(i)))
-z = range(len(lista))
-for i in lista:
-    i.start()
+
+
+def test_threadFunc():
+    lista = []
+    for i in range(3):
+        lista.append(test(loop,[10],str(i)))
+    z = range(len(lista))
+    for i in lista:
+        i.start()
+
+
+

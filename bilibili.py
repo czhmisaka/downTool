@@ -6,10 +6,15 @@ import threading
 import threadpool
 import datetime
 from fake_useragent import UserAgent
+import os
+import platform
 
 def printList(arr):
     for x in arr:
         print(x)
+
+def clearShellinWin():
+    os.system("cls")
 
 class spiderToolForBilibili():
     def __init__(self,url):
@@ -70,9 +75,17 @@ class spiderToolForBilibili():
         return link_list
     
 
-
-
-
+def getUa(type):
+    ua = UserAgent()
+    if type == 'chrome':
+        return ua.chrome
+    elif type == 'ie':
+        return ua.ie
+    elif type == 'opera':
+        return ua.opera
+    else:
+        print("Warning : No headers with "+type)
+        return []
 
 
 
@@ -85,10 +98,19 @@ class down():
             path:xxxxxxx,
             url:xxxxxx,
         }]
+
+        thread
+            -List   :线程列表
+            -MaxNum :最大线程数量
+        task
+            -List   :任务列表
+            -Key    :当前已创建下载的任务数量
+            -num    :当前任务列表的长度（任务数量）
+        key_Keep    :bool/False停止创建新的下载进程
         '''
         self.header = []
         self.threadList = []
-        self.threadNum = 10
+        self.threadMaxNum = 10
         self.taskList = []
         self.taskKey = 0
         self.taskNum = 0
@@ -96,24 +118,22 @@ class down():
         self.lock = threading.Lock
         self.pool = []
 
+    def saveHistory(self,path):
+        pass
+
     def pool(self,max):
-        while(self.taskKey<self.taskNum and self.key_Keep):
-            while(len(self.threadList)<self.threadNum):
-                deal = self.taskList[int(self.taskKey)]
-                self.threadList.append(commonThread(self.downImage,(deal['url'],deal['path'])))
-                self.threadList[len(self.threadList)].start()
-                self.taskKey = self.taskKey + 1
-
-    def speedFirst(self):
-        while(self.taskKey<self.taskNum and self.key_Keep):
-            deal = self.taskList[int(self.taskKey)]
-            '''
-            留个坑/之后优化
-            '''
-            self.threadList.append(commonThread(self.downImage,(deal['url'],deal['path'])))
-            self.threadList[len(self.threadList)].start()
-            self.taskKey = self.taskKey + 1
-
+        while(self.taskKey<=self.taskNum):
+            if self.key_Keep == False:
+                print('下载已经终止')
+                return False
+            else:
+                while(len(self.threadList)<self.threadMaxNum):
+                    deal = self.taskList[int(self.taskKey)]
+                    self.threadList.append(commonThread(self.downImage,(deal['url'],deal['path'])))
+                    self.threadList[len(self.threadList)].start()
+                    self.taskKey = self.taskKey + 1
+                time.sleep(1)
+    
     def downImage(self,url,path):
         '''
         下载一张图片/需要对应路径
@@ -185,5 +205,8 @@ class commonThread(threading.Thread):
         print('线程--<<'+self.name+'>>--已结束')
 
 
-def main():
-    return 0
+
+
+
+
+
