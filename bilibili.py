@@ -139,10 +139,11 @@ class down():
             elif self.taskKey<=self.taskNum:
                 while(len(self.threadList)<self.threadMaxNum):
                     deal = self.taskList[int(self.taskKey)]
-                    self.threadList.append(commonThread(self.downImage,(deal['url'],deal['path'])))
+                    self.threadList.append(_downTool_commonThread(self.downImage,(deal['url'],deal['path'])))
                     self.threadList[len(self.threadList)].start()
                     self.taskKey = self.taskKey + 1
-            elif self.taskKey>self.taskNum
+            elif self.taskKey>self.taskNum：
+                self.logTag('')
             
 
     def addMission(self,url,path):
@@ -227,7 +228,7 @@ class down():
             print(str(log))
 
 
-class commonThread(threading.Thread):
+class _downTool_commonThread(threading.Thread):
     def __init__(self,func,args,name):
         threading.Thread.__init__(self)
         self.func = func
