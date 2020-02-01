@@ -35,4 +35,12 @@ def test_threadFunc():
         i.start()
 
 
+a = [{'1':'asd','2':'qwe'},{'1':'asd','2':'qwe'}]
+
+i = 0
+for x in a:
+    print(i,end = ' : ')
+    print(x)
+    i+=1
+
 

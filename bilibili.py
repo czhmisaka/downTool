@@ -92,32 +92,42 @@ def getUa(type):
 class down():
     def __init__(self):
         '''
-        使用下载池控制下载负担
+        --downtool--
         taskList为任务队列，格式为
         [{
-            path:xxxxxxx,
-            url:xxxxxx,
-        },{
-            path:xxxxxxx,
-            url:xxxxxx,
+            path:xx,            -文件保存路径-
+            url:xx              -目标下载链接-
         }]
-
+        status为线程状态，格式为
+        [{
+            name:xxx,           -线程名称-
+            tag:xx,             -保存线程类型（下载线程/检查线程）-
+            now:xxxx,           -当前状态-
+            time_start:xxxx,    -线程开始时间-
+            goal:xxx,           -任务路径path-
+            timeLimit:xx,       -线程时间限制-
+        },]
 
         --变量说明--
+        header      :header
+        status      :线程状态-list
+        helper      :守护线程-dic
         thread
-            -List   :线程列表
+            -List   :线程列表-list
             -MaxNum :最大线程数量
         task
-            -List   :任务列表
+            -List   :任务队列-list
             -Key    :当前已创建下载的任务数量
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
-        lock        :进程锁/目前还没有什么用
+        lock        :进程锁/目前还没有什么用 
         pool        :下载池/目前还没有什么用
         log         :错误输出控制
         --变量说明--
         '''
         self.header = []
+        self.status = []
+        self.helper = {}
         self.threadList = []
         self.threadMaxNum = 10
         self.taskList = []
@@ -127,11 +137,26 @@ class down():
         self.lock = threading.Lock
         self.pool = []
         self.log = True
+    
+    def statusPrint(self):
+        while(self.key_Keep):
 
+            for i in range(len(self.status)):
+                print(i,end='')
+                print(self.status[i])
+        pass
+
+    
     def saveHistory(self,path):
+        '''
+        留个坑，下载历史
+        '''
         pass
 
     def pool(self,max):
+        '''
+        线程池
+        '''
         while(1):
             if self.key_Keep == False:
                 self.logTag('下载已经终止')
@@ -158,8 +183,10 @@ class down():
             })
         except:
             self.logTag("error : 添加失败 path:"+path+' url: '+url)
+            return False
         else:
             self.logTag("success :"+"任务添加成功"+"path:"+path+' url: '+url)
+            return True
 
     def downImage(self,url,path):
         '''
@@ -227,8 +254,15 @@ class down():
         if self.log == True:
             print(str(log))
 
+    def clearShellinWin():
+        os.system("cls")
+
+
 
 class _downTool_commonThread(threading.Thread):
+    '''
+    _downTool_公共线程工具
+    '''
     def __init__(self,func,args,name):
         threading.Thread.__init__(self)
         self.func = func
