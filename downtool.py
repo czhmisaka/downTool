@@ -1,6 +1,4 @@
 import requests
-from bs4 import BeautifulSoup as Bs4
-from selenium import webdriver
 import time
 import threading
 import threadpool
@@ -9,7 +7,70 @@ from fake_useragent import UserAgent
 import os
 import platform
 
+
+
+# class spiderToolForBilibili():
+#     def __init__(self,url):
+#         self.mainUrl = url
+#         self.threadingPoolMax = 10  
+#         self.timeOut = 400 #ms
+#         self.urlMap = []
+#         self.urlMap.append(self.mainUrl)
+#         # self.header = header; # 闲置 请求头
+
+#     def loopGet(self,deepLength):
+#         x = -1
+#         while(self.urlMap):
+#             x = x + 1
+#             link_list = []
+#             print(x)
+#             linklist = self.getHrefFromPage(self.urlMap[x])
+#             for z in linklist:
+#                 if z not in self.urlMap:
+#                     self.urlMap.append(z)
+#             if x >deepLength:
+#                 break
+#         return self.urlMap
+            
+        
+#     def getHrefFromPage(self,url):
+#         urlList = []
+#         urlList = self.getElement(url,'a')
+#         link_list = self.getHref(urlList)
+#         return link_list
+
+#     def getUrl(self,url):
+#         re = requests.get(url)
+#         re.encode = "utf-8"
+#         soup = Bs4(re.text,'lxml')
+#         return soup
+    
+#     def getElement(self,url,className):
+#         soup = self.getUrl(url)
+#         return soup.select(className)
+
+#     def getHref(self,a_list):
+#         link_list = []
+#         for x in a_list:
+#             link_str = x.get('href')
+#             print(link_str)
+#             if link_str:
+#                 if len(link_str)>1:    
+#                     if link_str[0] == 'h':
+#                         link_str = link_str
+#                         # link_str[0] = 'h'
+
+#                     elif link_str[0] == '/':
+#                         if link_str[1] == '/':
+#                             link_str = "https:"+link_str
+#                     link_list.append(link_str)
+#             print(link_str)
+#         return link_list
+    
 def printList(arr):
+    '''
+    打印列表
+    '''
     for x in arr:
         print(x)
 
@@ -20,66 +81,10 @@ def clearShellinWin():
     '''
     os.system("cls")
 
-class spiderToolForBilibili():
-    def __init__(self,url):
-        self.mainUrl = url
-        self.threadingPoolMax = 10  
-        self.timeOut = 400 #ms
-        self.urlMap = []
-        self.urlMap.append(self.mainUrl)
-        # self.header = header; # 闲置 请求头
-
-    def loopGet(self,deepLength):
-        x = -1
-        while(self.urlMap):
-            x = x + 1
-            link_list = []
-            print(x)
-            linklist = self.getHrefFromPage(self.urlMap[x])
-            for z in linklist:
-                if z not in self.urlMap:
-                    self.urlMap.append(z)
-            if x >deepLength:
-                break
-        return self.urlMap
-            
-        
-    def getHrefFromPage(self,url):
-        urlList = []
-        urlList = self.getElement(url,'a')
-        link_list = self.getHref(urlList)
-        return link_list
-
-    def getUrl(self,url):
-        re = requests.get(url)
-        re.encode = "utf-8"
-        soup = Bs4(re.text,'lxml')
-        return soup
-    
-    def getElement(self,url,className):
-        soup = self.getUrl(url)
-        return soup.select(className)
-
-    def getHref(self,a_list):
-        link_list = []
-        for x in a_list:
-            link_str = x.get('href')
-            print(link_str)
-            if link_str:
-                if len(link_str)>1:    
-                    if link_str[0] == 'h':
-                        link_str = link_str
-                        # link_str[0] = 'h'
-
-                    elif link_str[0] == '/':
-                        if link_str[1] == '/':
-                            link_str = "https:"+link_str
-                    link_list.append(link_str)
-            print(link_str)
-        return link_list
-    
-
 def getUa(type):
+    '''
+    获取一个对应浏览器类型的header
+    '''
     ua = UserAgent()
     if type == 'chrome':
         return ua.chrome
@@ -100,7 +105,9 @@ class down():
         taskList为任务队列，格式为
         [{
             path:xx,            -文件保存路径-
-            url:xx              -目标下载链接-
+            url:xx,             -目标下载链接-
+            isDown:xx,          -确认是否被下载过-
+            isCheck:xx          -确认是否被检查过-
         }]
         status为线程状态，格式为
         [{
@@ -110,7 +117,7 @@ class down():
             time_start:xxxx,    -线程开始时间-
             goal:xxx,           -任务路径path-
             timeLimit:xx,       -线程时间限制-
-        },]
+        }]
 
         --变量说明--
         header      :header
@@ -146,13 +153,10 @@ class down():
     
     def start(self):
         '''
-        启动守护线程
+        启动
         '''
-          
-        pass        
-    
-    
-
+        self.helper = _downTool_commonThread(self.statusPrint,(),'0')
+        
     def statusPrint(self):
         '''
         下载状态显示（暂定）
@@ -166,8 +170,26 @@ class down():
                 print(i,end='')
                 print(self.status[i])
             time.sleep(self.tick)
-  
-    
+
+    def workProcess_create(self):
+        
+
+    def workProcess(self,tag):
+        '''
+        工作进程
+        '''
+        while(self.key_Keep):
+            self.lock.acquire()
+            if self.taskKey>self.taskNum:
+                self.lock.release()
+                time.sleep(1)
+                continue
+            else:
+                deal = self.taskList[self.key_Keep]
+                self.key_Keep = self.key_Keep + 1
+                self.lock.release()
+            
+        return 0
     def saveHistory(self,path):
         '''
         留个坑，下载历史
@@ -185,10 +207,10 @@ class down():
             elif self.taskKey<=self.taskNum:
                 while(len(self.threadList)<self.threadMaxNum):
                     deal = self.taskList[int(self.taskKey)]
-                    self.threadList.append(_downTool_commonThread(self.downImage,(deal['url'],deal['path'])))
+                    # self.threadList.append(_downTool_commonThread(self.downImage,(deal['url'],deal['path'])))
                     self.threadList[len(self.threadList)].start()
                     self.taskKey = self.taskKey + 1
-            elif self.taskKey>self.taskNum：
+            elif self.taskKey>self.taskNum:
                 self.logTag('')
             
 
@@ -226,10 +248,10 @@ class down():
                 with open(path,'wb') as f:
                     for chunk in pp:
                         f.write(chunk)
-                self.logTag("第"+path+"张下载好。")
+                self.logTag("路径："+path+"下载好。")
                 return True
         except:
-            self.logTag("Error<<downImage()>>self:"+self+"-path:"+path+"-url:"+url)
+            self.logTag("Error<<downImage()>> self:"+self+"-path:"+path+"-url:"+url)
             
 
     def mkdirFile(self,path):
@@ -271,7 +293,7 @@ class down():
     def logTag(self,log):
         '''
         可关闭的输出
-        '''
+        ''' 
         if self.log == True:
             print(str(log))
 
@@ -279,6 +301,11 @@ class down():
         os.system("cls")
 
 
+# class _downTool_workProcess(threading.Thread):
+#     '''
+#     _downTool_工作线程/下载/检查 
+#     '''
+#     def __init__(self,)
 
 class _downTool_commonThread(threading.Thread):
     '''
