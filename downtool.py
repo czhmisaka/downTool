@@ -155,7 +155,20 @@ class down():
         '''
         启动
         '''
-        self.helper = _downTool_commonThread(self.statusPrint,(),'0')
+        status = {
+            'name':'',
+            'tag':0,
+            'now':'wait',
+            'time_start':datetime.datetime.now,
+            'goal':'',
+            'timeLimit':''
+        }
+        for x in range(self.threadMaxNum): 
+            self.threadList.append(status)
+        for x in range(self.threadMaxNum):
+            self.threadList[x]['tag'] = x
+            print(self.threadList[x])
+        # self.helper = _downTool_commonThread(self.statusPrint,(),'0')
         
     def statusPrint(self):
         '''
@@ -172,6 +185,11 @@ class down():
             time.sleep(self.tick)
 
     def workProcess_create(self):
+        '''
+        创建工作进程
+        '''
+        # self[]
+        pass
         
 
     def workProcess(self,tag):
