@@ -14,6 +14,10 @@ def printList(arr):
         print(x)
 
 def clearShellinWin():
+    '''
+    max:clear
+    win:cls
+    '''
     os.system("cls")
 
 class spiderToolForBilibili():
@@ -121,8 +125,9 @@ class down():
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
         lock        :进程锁/目前还没有什么用 
-        pool        :下载池/目前还没有什么用
+        pool        :下载池/目前还没有什么用 
         log         :错误输出控制
+        tick        :状态更新间隔
         --变量说明--
         '''
         self.header = []
@@ -137,15 +142,31 @@ class down():
         self.lock = threading.Lock
         self.pool = []
         self.log = True
+        self.tick = 0.5
     
-    def statusPrint(self):
-        while(self.key_Keep):
+    def start(self):
+        '''
+        启动守护线程
+        '''
+          
+        pass        
+    
+    
 
+    def statusPrint(self):
+        '''
+        下载状态显示（暂定）
+        目前使用终端显示，希望之后可以改成用vue的界面显示
+        留个坑
+        '''
+        while(self.key_Keep):
+            print('当前状态:',end=' : ')
+            print(self.helper)
             for i in range(len(self.status)):
                 print(i,end='')
                 print(self.status[i])
-        pass
-
+            time.sleep(self.tick)
+  
     
     def saveHistory(self,path):
         '''
