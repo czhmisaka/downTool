@@ -13,65 +13,6 @@ import platform
 请找到自己的意义
 
 '''
-
-
-# class spiderToolForBilibili():
-#     def __init__(self,url):
-#         self.mainUrl = url
-#         self.threadingPoolMax = 10  
-#         self.timeOut = 400 #ms
-#         self.urlMap = []
-#         self.urlMap.append(self.mainUrl)
-#         # self.header = header; # 闲置 请求头
-
-#     def loopGet(self,deepLength):
-#         x = -1
-#         while(self.urlMap):
-#             x = x + 1
-#             link_list = []
-#             print(x)
-#             linklist = self.getHrefFromPage(self.urlMap[x])
-#             for z in linklist:
-#                 if z not in self.urlMap:
-#                     self.urlMap.append(z)
-#             if x >deepLength:
-#                 break
-#         return self.urlMap
-            
-        
-#     def getHrefFromPage(self,url):
-#         urlList = []
-#         urlList = self.getElement(url,'a')
-#         link_list = self.getHref(urlList)
-#         return link_list
-
-#     def getUrl(self,url):
-#         re = requests.get(url)
-#         re.encode = "utf-8"
-#         soup = Bs4(re.text,'lxml')
-#         return soup
-    
-#     def getElement(self,url,className):
-#         soup = self.getUrl(url)
-#         return soup.select(className)
-
-#     def getHref(self,a_list):
-#         link_list = []
-#         for x in a_list:
-#             link_str = x.get('href')
-#             print(link_str)
-#             if link_str:
-#                 if len(link_str)>1:    
-#                     if link_str[0] == 'h':
-#                         link_str = link_str
-#                         # link_str[0] = 'h'
-
-#                     elif link_str[0] == '/':
-#                         if link_str[1] == '/':
-#                             link_str = "https:"+link_str
-#                     link_list.append(link_str)
-#             print(link_str)
-#         return link_list
     
 def printList(arr):
     '''
