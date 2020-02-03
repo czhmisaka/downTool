@@ -7,6 +7,12 @@ from fake_useragent import UserAgent
 import os
 import platform
 
+'''
+
+请记住，人总是本能的排斥没有创造性的工作
+请找到自己的意义
+
+'''
 
 
 # class spiderToolForBilibili():
@@ -111,13 +117,20 @@ class down():
         }]
         status为线程状态，格式为
         [{
+            'tag':x,
+            'now':'wait',
+            'goal':''
+        }]
+        threadList为线程列表，格式为
+        [{
             name:xxx,           -线程名称-
             tag:xx,             -保存线程类型（下载线程/检查线程）-
             now:xxxx,           -当前状态-
             time_start:xxxx,    -线程开始时间-
             goal:xxx,           -任务路径path-
-            timeLimit:xx,       -线程时间限制-
+            thread:xx,          -线程时间限制-
         }]
+        
 
         --变量说明--
         header      :header
@@ -146,29 +159,37 @@ class down():
         self.taskKey = 0
         self.taskNum = 0
         self.key_Keep = True 
-        self.lock = threading.Lock
+        self.lock = threading.Lock()
         self.pool = []
-        self.log = True
+        self.log = False
         self.tick = 0.5
     
     def start(self):
         '''
         启动
         '''
-        status = {
-            'name':'',
-            'tag':0,
-            'now':'wait',
-            'time_start':datetime.datetime.now,
-            'goal':'',
-            'timeLimit':''
-        }
+        timeStart = datetime.datetime.now()
         for x in range(self.threadMaxNum): 
+            status = {
+                'name':'',
+                'tag':x,
+                'now':'wait',
+                'time_start':str(timeStart),
+                'goal':'',
+                'thread':''
+            }
             self.threadList.append(status)
-        for x in range(self.threadMaxNum):
-            self.threadList[x]['tag'] = x
-            print(self.threadList[x])
-        # self.helper = _downTool_commonThread(self.statusPrint,(),'0')
+            status = {
+                'tag':x,
+                'now':'wait',
+                'goal':''
+            }
+            self.status.append(status)
+        # printList(self.status)
+        for x in self.threadList:
+            self.workProcess_create(x)
+        self.helper = _downTool_commonThread(self.statusPrint,(),'0')
+        self.helper.start()
         
     def statusPrint(self):
         '''
@@ -177,70 +198,84 @@ class down():
         留个坑
         '''
         while(self.key_Keep):
+            self.clearShellinWin()
             print('当前状态:',end=' : ')
             print(self.helper)
-            for i in range(len(self.status)):
-                print(i,end='')
-                print(self.status[i])
+            print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
+            if self.log:
+                for i in range(len(self.threadList)):
+                    print(i,end=' : ')
+                    print(self.threadList[i])
+            for x in range(len(self.status)):
+                print('线程<'+str(x)+'>',end=' : ')
+                print(self.status[x]) 
             time.sleep(self.tick)
 
-    def workProcess_create(self):
+    def workProcess_create(self,threadStatus):
         '''
         创建工作进程
         '''
-        # self[]
-        pass
-        
+        if self.key_Keep:
+            tag = threadStatus['tag']
+            self.threadList[threadStatus['tag']]['thread'] = _downTool_commonThread(self.workProcess,(tag,'name'),'name'+str(threadStatus['tag'])) 
+            self.threadList[threadStatus['tag']]['thread'].start()
+        else:
+            print('工作进程创建终止')
 
-    def workProcess(self,tag):
+    def workProcess(self,tag,name):
         '''
         工作进程
         '''
+        deal = {}
         while(self.key_Keep):
             self.lock.acquire()
-            if self.taskKey>self.taskNum:
+            if self.taskNum==0:
                 self.lock.release()
+                self.changeStatusByTag(tag,'等待任务','')
+                time.sleep(1)
+                continue
+            elif self.taskKey>=self.taskNum:
+                self.lock.release()
+                self.changeStatusByTag(tag,'等待任务','')
                 time.sleep(1)
                 continue
             else:
-                deal = self.taskList[self.key_Keep]
-                self.key_Keep = self.key_Keep + 1
+                deal = self.taskList[self.taskKey]
+                self.taskKey = self.taskKey + 1
                 self.lock.release()
-            
-        return 0
+            self.changeStatusByTag(tag,'开始下载',deal['path'])
+            if self.downImage(deal['url'],deal['path']):
+                self.changeStatusByTag(tag,'完成下载',deal['path'])
+                continue
+            else:
+                if not self.downImage(deal['url'],deal['path']):
+                    self.addMission(deal['url'],deal['path'])
+
+    def changeStatusByTag(self,tag,status_tag1,status_tag2):
+        for x in range(len(self.status)):
+            if self.status[x]['tag']==tag:
+                self.status[x]['now']= str(status_tag1)
+                self.status[x]['goal']= str(status_tag2)
+
     def saveHistory(self,path):
         '''
         留个坑，下载历史
         '''
         pass
 
-    def pool(self,max):
-        '''
-        线程池
-        '''
-        while(1):
-            if self.key_Keep == False:
-                self.logTag('下载已经终止')
-                return False
-            elif self.taskKey<=self.taskNum:
-                while(len(self.threadList)<self.threadMaxNum):
-                    deal = self.taskList[int(self.taskKey)]
-                    # self.threadList.append(_downTool_commonThread(self.downImage,(deal['url'],deal['path'])))
-                    self.threadList[len(self.threadList)].start()
-                    self.taskKey = self.taskKey + 1
-            elif self.taskKey>self.taskNum:
-                self.logTag('')
-            
-
     def addMission(self,url,path):
         '''
         加入一个新的任务
         '''
         try:
+            path = str(path)
+            url = str(url)
             self.taskNum = self.taskNum + 1
             self.taskList.append({
                 'path':path,
-                'url':url
+                'url':url,
+                'isCheck':False,
+                'isDown':False
             })
         except:
             self.logTag("error : 添加失败 path:"+path+' url: '+url)
@@ -270,6 +305,7 @@ class down():
                 return True
         except:
             self.logTag("Error<<downImage()>> self:"+self+"-path:"+path+"-url:"+url)
+            return False
             
 
     def mkdirFile(self,path):
@@ -315,15 +351,12 @@ class down():
         if self.log == True:
             print(str(log))
 
-    def clearShellinWin():
+    def clearShellinWin(self):
+        '''
+        清屏/终端用 win
+        '''
         os.system("cls")
 
-
-# class _downTool_workProcess(threading.Thread):
-#     '''
-#     _downTool_工作线程/下载/检查 
-#     '''
-#     def __init__(self,)
 
 class _downTool_commonThread(threading.Thread):
     '''
