@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-# downTool
+# DtServer
 spider down tool / made by python
 
 任务-2020年2月：
@@ -8,8 +8,7 @@ spider down tool / made by python
 3. 多线程下载/下载检查（使用额外的线程进行检查）	--未完成
 	a. 文件类型/路径访问性检查
 	b. 文件大小检查   		                    
-4. 多线程下载/下载线程							  --未完成			           
-	a. 超时控制
+4. 多线程下载/下载线程							  --完成			           
 5. 生成下载列表，保存下载历史			
 6. 下载器界面
 	a. 图形化界面
