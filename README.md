@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 # downTool
 spider down tool / made by python
 

@@ -1,0 +1,33 @@
+Metadata-Version: 2.1
+Name: downtool
+Version: 0.1.1
+Summary: a downtool for everyone who want to have a good experience with Crawling every image wanted.
+Home-page: https://github.com/czhmisaka/downtool
+Author: chen zhihan&xu chengbo
+Author-email: im.czh@qq.com
+License: MIT Licence
+Description: # -*- coding: utf-8
+        # downTool
+        spider down tool / made by python
+        
+        任务-2020年2月：
+        1. 伪装头生成					                 --完成
+        2. 多线程下载/守护线程/用于显示当前已完成的下载进度	--完成
+        3. 多线程下载/下载检查（使用额外的线程进行检查）	
+        	a. 文件类型/路径访问性检查
+        	b. 文件大小检查   		                    
+        4. 多线程下载/下载线程							  --完成			           
+        5. 生成下载列表，保存下载历史			
+        6. 下载器界面
+        	a. 图形化界面
+        	b. 终端进度显示					
+        7. 可控制的错误输出							
+        8. 提供人性化（英语白痴般）的注释	
+        9. 提供测试方式									  --未完成
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

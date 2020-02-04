@@ -1,11 +1,9 @@
 import requests
 import time
 import threading
-import threadpool
 import datetime
 from fake_useragent import UserAgent
 import os
-import platform
 
 '''
 
@@ -83,6 +81,7 @@ class down():
         task
             -List   :任务队列-list
             -Key    :当前已创建下载的任务数量
+            -CheckKey:当前已检查的任务数量
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
         lock        :进程锁/目前还没有什么用 
@@ -99,6 +98,7 @@ class down():
         self.taskList = []
         self.taskKey = 0
         self.taskNum = 0
+        self.taskCheckKey = 0
         self.key_Keep = True 
         self.lock = threading.Lock()
         self.pool = []
@@ -151,6 +151,9 @@ class down():
                 print('线程<'+str(x)+'>',end=' : ')
                 print(self.status[x]) 
             time.sleep(self.tick)
+    def checkProcess(self):
+        if self.key_Keep:
+            return 0
 
     def workProcess_create(self,threadStatus):
         '''
@@ -276,6 +279,7 @@ class down():
                 return False
         except:
             self.logTag("Error:"+datetime.datetime.now+":checkFile:"+path)
+            return False
 
     def pathDeal(self,path):
         '''
