@@ -76,7 +76,6 @@ class down():
         header      :header
         status      :线程状态-list
         helper      :守护线程-thread
-        timeControler:超时限制-thread
         thread
             -List   :线程列表-list
             -MaxNum :最大线程数量
@@ -89,13 +88,12 @@ class down():
         lock        :进程锁/目前还没有什么用 
         log         :错误输出控制
         tick        :状态更新间隔
-        timeOut   :超时时间
+        timeOut     :超时时间
         --变量说明--
         '''
         self.header = []
         self.status = []
         self.helper = {}
-        self.timeControler = {}
         self.threadList = []
         self.threadMaxNum = 10
         self.taskList = []
@@ -106,7 +104,7 @@ class down():
         self.lock = threading.Lock()
         self.log = False
         self.tick = 0.5
-        self.timeOut = 5
+        self.timeOut = 4
 
     
     def start(self):
@@ -220,12 +218,12 @@ class down():
         留个坑/读取下载历史
         '''
         pass
-    def saveHistory(self):
+    def saveHistory(self,path):
         '''
         留个坑/下载历史
         '''
         pass
- 
+    
     def addMission(self,url,path):
         '''
         加入一个新的任务
@@ -267,7 +265,7 @@ class down():
                 self.logTag("路径："+path+"下载好。")
                 return True
         except:
-            self.logTag("Error<<downLoad()>> self:"+self+"-path:"+path+"-url:"+url)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)
             return False
             
 
@@ -299,6 +297,11 @@ class down():
         except:
             self.logTag("Error:"+datetime.datetime.now+":checkFile:"+path)
             return False
+    def getDesktopPath(self):
+        '''
+        获取桌面路径
+        '''
+        pass
 
     def pathDeal(self,path):
         '''
@@ -320,18 +323,6 @@ class down():
         清屏/终端用 win
         '''
         os.system("cls")
-    
-    def checkTimeOut(self,timed):
-        if (self.getTimeNow()-timed)>4:
-            return True
-        else:
-            return False
-
-    def getTimeNow(self):
-        timed = datetime.datetime.now()
-        timed = datetime.datetime.timestamp(timed)
-        self.logTag(timed)
-        return timed
 
 class _downTool_commonThread(threading.Thread):
     '''

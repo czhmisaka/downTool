@@ -3,20 +3,21 @@ import datetime
 import time
 import requests
 
-
-
-
-
-# a = down()
-# a.threadMaxNum =30
-# a.tick = 0.3
-# a.start()
-# # a.log = True
-# time.sleep(1)
-# for x in range(100):
-#     a.addMission('https://img-cf-lemon.x-resource04.com/media_lemon/img/pics/20200203/2020020319270910910_478_666.png','C:/Users/Administrator/Desktop/1.jpg')
-#     time.sleep(0.1)
-# time.sleep(10)
-# a.key_Keep = False
+a = down()
+a.timeOut = 0.5
+# a.downLoad("http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg",'C:/Users/Administrator/Desktop/1.jpg')
+a.threadMaxNum = 40
+a.start()
+time.sleep(1)
+a.tick = 0.2
+for x in range(100):
+    a.addMission('http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg','../1.jpg')
+    a.addMission('http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg','../1.jpg')
+    a.addMission('http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg','../1.jpg')
+    a.addMission('http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg','../1.jpg')
+    a.addMission('http://img.pconline.com.cn/images/upload/upc/tx/softbbs/1203/30/c0/11084223_1333038001044_1_1024x1024soft.jpg','../1.jpg')
+    time.sleep(0.1) 
+time.sleep(10)
+a.key_Keep = False
 
 
