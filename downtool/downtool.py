@@ -108,7 +108,6 @@ class down():
         self.tick = 0.5
         self.timeOut = 4
         self.file_history = 'DownToolHistory.json'
-
     
     def start(self):
         '''
@@ -136,16 +135,6 @@ class down():
             self.workProcess_create(x)
         self.helper = _downTool_commonThread(self.statusPrint,(),'0')
         self.helper.start()
-    
-    # def timeControl(self):
-    #     '''
-    #     控制下载线程//超时//
-    #     '''
-    #     while(self.key_Keep):
-    #         time.sleep(self.tick)
-    #         for x in range(len(self.threadList)):
-    #             if self.checkTimeOut(self.threadList[x]['time']):
-    #                 self.threadList[x]['thread']
 
     def stop(self):
         self.key_Keep = False
@@ -186,6 +175,7 @@ class down():
     def workProcess(self,tag,name):
         '''
         工作进程
+        下载失败之后自动把失败任务重新添加到下载队列中
         '''
         deal = {}
         while(self.key_Keep):
@@ -205,11 +195,11 @@ class down():
                 self.taskKey = self.taskKey + 1
                 self.lock.release()
             self.changeStatusByTag(tag,'开始下载',deal['path'])
-            if self.downLoad(deal['url'],deal['path']):
+            if self.downLoad(deal['url'],deal['path'],tag):
                 self.changeStatusByTag(tag,'完成下载',deal['path'])
                 continue
             else:
-                if not self.downLoad(deal['url'],deal['path']):
+                if not self.downLoad(deal['url'],deal['path'],tag):
                     self.addMission(deal['url'],deal['path'])
 
     def changeStatusByTag(self,tag,status_tag1,status_tag2):
@@ -271,10 +261,11 @@ class down():
             self.logTag("success : 任务添加成功"+"path:"+path+' url: '+url)
             return True
 
-    def downLoad(self,url,path):
+    def downLoad(self,url,path,tag):
         ''' 
         下载一张图片/需要对应路径
         单线程下载
+        超时控制
         '''
         try:
             path = self.pathDeal(path)
@@ -291,6 +282,7 @@ class down():
                 self.logTag("路径："+path+"下载好。")
                 return True
         except:
+            self.changeStatusByTag(tag,'超时',path)
             self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)
             return False
             

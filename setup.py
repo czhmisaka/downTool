@@ -5,7 +5,7 @@ with open("README.md", "r",encoding='utf-8') as fh:
 
 setuptools.setup(
     name="downtool", 
-    version="0.1.1",
+    version="0.1.2",
     author="chen zhihan&xu chengbo",
     license='MIT Licence',
     author_email="im.czh@qq.com",
