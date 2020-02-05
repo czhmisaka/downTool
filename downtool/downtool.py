@@ -9,6 +9,7 @@ import os
 
 请记住，人总是本能的排斥没有创造性的工作
 请找到自己的意义
+Ps:不要把tick设置的太长or太短
 
 '''
     
@@ -74,7 +75,8 @@ class down():
         --变量说明--
         header      :header
         status      :线程状态-list
-        helper      :守护线程-dic
+        helper      :守护线程-thread
+        timeControler:超时限制-thread
         thread
             -List   :线程列表-list
             -MaxNum :最大线程数量
@@ -85,14 +87,15 @@ class down():
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
         lock        :进程锁/目前还没有什么用 
-        pool        :下载池/目前还没有什么用 
         log         :错误输出控制
         tick        :状态更新间隔
+        timeOut   :超时时间
         --变量说明--
         '''
         self.header = []
         self.status = []
         self.helper = {}
+        self.timeControler = {}
         self.threadList = []
         self.threadMaxNum = 10
         self.taskList = []
@@ -101,15 +104,17 @@ class down():
         self.taskCheckKey = 0
         self.key_Keep = True 
         self.lock = threading.Lock()
-        self.pool = []
         self.log = False
         self.tick = 0.5
+        self.timeOut = 5
+
     
     def start(self):
         '''
         启动
         '''
         timeStart = datetime.datetime.now()
+        timeStart = datetime.datetime.timestamp(timeStart)
         for x in range(self.threadMaxNum): 
             status = {
                 'name':'',
@@ -126,12 +131,23 @@ class down():
                 'goal':''
             }
             self.status.append(status)
-        # printList(self.status)
         for x in self.threadList:
             self.workProcess_create(x)
         self.helper = _downTool_commonThread(self.statusPrint,(),'0')
         self.helper.start()
-        
+    
+    # def timeControl(self):
+    #     '''
+    #     控制下载线程//超时//
+    #     '''
+    #     while(self.key_Keep):
+    #         time.sleep(self.tick)
+    #         for x in range(len(self.threadList)):
+    #             if self.checkTimeOut(self.threadList[x]['time']):
+    #                 self.threadList[x]['thread']
+
+
+
     def statusPrint(self):
         '''
         下载状态显示（暂定）
@@ -151,6 +167,7 @@ class down():
                 print('线程<'+str(x)+'>',end=' : ')
                 print(self.status[x]) 
             time.sleep(self.tick)
+            
 
     def workProcess_create(self,threadStatus):
         '''
@@ -198,12 +215,17 @@ class down():
                 self.status[x]['now']= str(status_tag1)
                 self.status[x]['goal']= str(status_tag2)
 
-    def saveHistory(self,path):
+    def getHistory(self,path):
         '''
-        留个坑，下载历史
+        留个坑/读取下载历史
         '''
         pass
-
+    def saveHistory(self):
+        '''
+        留个坑/下载历史
+        '''
+        pass
+ 
     def addMission(self,url,path):
         '''
         加入一个新的任务
@@ -219,20 +241,20 @@ class down():
                 'isDown':False
             })
         except:
-            self.logTag("error : 添加失败 path:"+path+' url: '+url)
+            self.logTag("error : 任务添加失败 path:"+path+' url: '+url)
             return False
         else:
-            self.logTag("success :"+"任务添加成功"+"path:"+path+' url: '+url)
+            self.logTag("success : 任务添加成功"+"path:"+path+' url: '+url)
             return True
 
     def downImage(self,url,path):
-        '''
+        ''' 
         下载一张图片/需要对应路径
         单线程下载
         '''
         try:
             path = self.pathDeal(path)
-            pp = requests.get(url,headers = self.header)
+            pp = requests.get(url,headers = self.header,timeout = self.timeOut)
             if str(pp) ==  "<Response [404]>":
                 self.logTag("Warning 404 : check the url right")
                 return False
@@ -298,7 +320,18 @@ class down():
         清屏/终端用 win
         '''
         os.system("cls")
+    
+    def checkTimeOut(self,timed):
+        if (self.getTimeNow()-timed)>4:
+            return True
+        else:
+            return False
 
+    def getTimeNow(self):
+        timed = datetime.datetime.now()
+        timed = datetime.datetime.timestamp(timed)
+        self.logTag(timed)
+        return timed
 
 class _downTool_commonThread(threading.Thread):
     '''
