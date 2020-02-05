@@ -4,6 +4,7 @@ import threading
 import datetime
 from fake_useragent import UserAgent
 import os
+import json
 
 '''
 
@@ -89,6 +90,7 @@ class down():
         log         :错误输出控制
         tick        :状态更新间隔
         timeOut     :超时时间
+        file_history:下载历史记录-json
         --变量说明--
         '''
         self.header = []
@@ -105,6 +107,7 @@ class down():
         self.log = False
         self.tick = 0.5
         self.timeOut = 4
+        self.file_history = 'DownToolHistory.json'
 
     
     def start(self):
@@ -144,7 +147,9 @@ class down():
     #             if self.checkTimeOut(self.threadList[x]['time']):
     #                 self.threadList[x]['thread']
 
-
+    def stop(self):
+        self.key_Keep = False
+        self.saveHistory()
 
     def statusPrint(self):
         '''
@@ -213,16 +218,37 @@ class down():
                 self.status[x]['now']= str(status_tag1)
                 self.status[x]['goal']= str(status_tag2)
 
-    def getHistory(self,path):
+    def getHistory(self):
         '''
-        留个坑/读取下载历史
+        读取下载历史
         '''
-        pass
-    def saveHistory(self,path):
+        try:
+            data = {}
+            with open(self.file_history,'r') as fileObj:
+                data = json.load(fileObj)
+            self.taskKey = data['key']
+            self.taskList = data['list']
+            self.taskNum = len(self.taskList)
+            if self.taskKey>self.taskNum:
+                raise ''
+        except :
+            self.logTag('error<<getHistory>>:读取失败//path'+self.file_history)
+        
+
+    def saveHistory(self):
         '''
-        留个坑/下载历史
+        保存下载历史
         '''
-        pass
+        try:
+            data = {
+                'key':self.taskKey,
+                'list':self.taskList
+            }
+            with open(self.file_history,'w') as fileObj:
+                json.dump(data,fileObj)
+        except:
+            self.logTag("error<<saveHistory>>:保存失败//path="+self.file_history)
+        
     
     def addMission(self,url,path):
         '''
@@ -301,8 +327,8 @@ class down():
         '''
         获取桌面路径
         '''
-        pass
-
+        return os.path.join(os.path.expanduser('~'),"Desktop")
+        
     def pathDeal(self,path):
         '''
         下载路径处理
