@@ -202,11 +202,11 @@ class down():
                 self.taskKey = self.taskKey + 1
                 self.lock.release()
             self.changeStatusByTag(tag,'开始下载',deal['path'])
-            if self.downImage(deal['url'],deal['path']):
+            if self.downLoad(deal['url'],deal['path']):
                 self.changeStatusByTag(tag,'完成下载',deal['path'])
                 continue
             else:
-                if not self.downImage(deal['url'],deal['path']):
+                if not self.downLoad(deal['url'],deal['path']):
                     self.addMission(deal['url'],deal['path'])
 
     def changeStatusByTag(self,tag,status_tag1,status_tag2):
@@ -247,7 +247,7 @@ class down():
             self.logTag("success : 任务添加成功"+"path:"+path+' url: '+url)
             return True
 
-    def downImage(self,url,path):
+    def downLoad(self,url,path):
         ''' 
         下载一张图片/需要对应路径
         单线程下载
@@ -267,7 +267,7 @@ class down():
                 self.logTag("路径："+path+"下载好。")
                 return True
         except:
-            self.logTag("Error<<downImage()>> self:"+self+"-path:"+path+"-url:"+url)
+            self.logTag("Error<<downLoad()>> self:"+self+"-path:"+path+"-url:"+url)
             return False
             
 
