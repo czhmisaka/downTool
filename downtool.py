@@ -1,12 +1,13 @@
+# -*- coding: utf-8
 import requests
 import time
 import threading
-import threadpool
 import datetime
-from fake_useragent import UserAgent
 import os
 import platform
-
+import random
+import json
+from socketIO_client import SocketIO, BaseNamespace
 '''
 
 请记住，人总是本能的排斥没有创造性的工作
@@ -104,7 +105,8 @@ class down():
         self.pool = []
         self.log = False
         self.tick = 0.5
-    
+        self.serverStatus = False
+        self.tasks = []
     def start(self):
         '''
         启动
@@ -232,7 +234,7 @@ class down():
         '''
         try:
             path = self.pathDeal(path)
-            pp = requests.get(url,headers = self.header)
+            pp = requests.get(url,headers = self.header,verify=False)
             if str(pp) ==  "<Response [404]>":
                 self.logTag("Warning 404 : check the url right")
                 return False
@@ -297,6 +299,72 @@ class down():
         清屏/终端用 win
         '''
         os.system("cls")
+    def openWebServer(self):
+        '''
+        向web服务器发送接收数据
+        '''
+        def _serverThead():
+            def _onstart(*args):
+                print("server 连接成功")
+                #self.chat.emit('message',"ok")
+                _onupdate()
+            def _onupdate(*args):
+                print(args)
+                if len(args)>0 and args[0].get('code')==3:
+                    _task = args[0]['data']
+                    _task["filename"] = _task["name"]
+                    _task["per"] = random.randint(0,100)
+                    self.tasks.append(_task)
+                    self.addMission(_task["url"],os.path.join('test_file',_task["path"]))
+                    self.start()
+                else:
+                    pass
+                data = {
+                        "code":1,
+                        "tasks" :json.dumps(self.tasks)
+                    }
+                self.chat.emit('onupdate',data)
+
+            socket = SocketIO('127.0.0.1',8900)
+            self.chat = socket.define(BaseNamespace, '/client')
+            self.chat.on('onstart', _onstart)
+            self.chat.on('onupdate', _onupdate)
+            self.chat.emit('checkStatus',"ok")
+            while True:
+                socket.wait(seconds=1)
+            # while self.serverStatus:
+            #     task = {
+            #     }
+            #     data = {
+            #         "tasks" :json.dumps(self.tasks)
+            #     }
+            #     try:
+            #         res = requests.post(url="http://127.0.0.1:8900/refresh",data=data)
+            #     except Exception as e:
+            #         print(e)
+            #         time.sleep(1)
+            #         continue
+            #     res.encoding = 'utf-8'
+            #     _res = res.content.decode('utf-8')
+            #     if _res != "ok" :
+            #         print(_res)
+            #         _task = json.loads(_res,encoding='utf-8')
+            #         print(_task)
+            #         _task["filename"] = _task["name"]
+            #         _task["per"] = random.randint(0,100)
+            #         self.tasks.append(_task)
+            #         self.addMission(_task["url"],os.path.join('test_file',_task["path"]))
+            #         self.start()
+            #     time.sleep(1)
+
+            # while self.serverStatus:
+            #     tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            #     tcp_client.connect(('localhost',8900))
+                
+        serverThead = threading.Thread(target=_serverThead,args=[])
+        self.serverStatus = True
+        serverThead.start()
+
 
 
 class _downTool_commonThread(threading.Thread):
