@@ -1,10 +1,9 @@
-# -*- coding: utf-8
 import requests
 import time
 import threading
 import datetime
+from fake_useragent import UserAgent
 import os
-import platform
 import random
 import json
 from socketIO_client import SocketIO, BaseNamespace
@@ -84,6 +83,7 @@ class down():
         task
             -List   :任务队列-list
             -Key    :当前已创建下载的任务数量
+            -CheckKey:当前已检查的任务数量
             -num    :当前任务列表的长度（任务数量）
         key_Keep    :bool/False停止创建新的下载进程
         lock        :进程锁/目前还没有什么用 
@@ -100,13 +100,14 @@ class down():
         self.taskList = []
         self.taskKey = 0
         self.taskNum = 0
+        self.taskCheckKey = 0
         self.key_Keep = True 
         self.lock = threading.Lock()
         self.pool = []
         self.log = False
         self.tick = 0.5
-        self.serverStatus = False
-        self.tasks = []
+        self.tasks = {}
+    
     def start(self):
         '''
         启动
@@ -156,7 +157,7 @@ class down():
 
     def workProcess_create(self,threadStatus):
         '''
-        创建工作进程
+        创建工作进程/下载
         '''
         if self.key_Keep:
             tag = threadStatus['tag']
@@ -234,7 +235,7 @@ class down():
         '''
         try:
             path = self.pathDeal(path)
-            pp = requests.get(url,headers = self.header,verify=False)
+            pp = requests.get(url,headers = self.header)
             if str(pp) ==  "<Response [404]>":
                 self.logTag("Warning 404 : check the url right")
                 return False
@@ -278,6 +279,7 @@ class down():
                 return False
         except:
             self.logTag("Error:"+datetime.datetime.now+":checkFile:"+path)
+            return False
 
     def pathDeal(self,path):
         '''
@@ -299,7 +301,8 @@ class down():
         清屏/终端用 win
         '''
         os.system("cls")
-    def openWebServer(self):
+
+     def openWebServer(self):
         '''
         向web服务器发送接收数据
         '''
@@ -364,9 +367,6 @@ class down():
         serverThead = threading.Thread(target=_serverThead,args=[])
         self.serverStatus = True
         serverThead.start()
-
-
-
 class _downTool_commonThread(threading.Thread):
     '''
     _downTool_公共线程工具
