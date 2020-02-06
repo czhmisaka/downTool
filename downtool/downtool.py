@@ -51,25 +51,27 @@ class down():
         --downtool--
         taskList为任务队列，格式为
         [{
-            path:xx,            -文件保存路径-
-            url:xx,             -目标下载链接-
-            isDown:xx,          -确认是否被下载过-
-            isCheck:xx          -确认是否被检查过-
+            path:str,               -文件保存路径-
+            url:str,                -目标下载链接-
+            isDown:bool,            -确认是否被下载过-
+            isCheck:bool,           -确认是否被检查过-
+            reDown:int            -重复添加次数/避免重复下载错误文件
         }]
         status为线程状态，格式为
         [{
-            'tag':x,
-            'now':'wait',
-            'goal':''
+            'tag':x,                -线程编号-
+            'now':'wait',           -线程状态-
+            'rate':int              -当前任务进度（0~100）-
+            'goal':''               -线程任务目标（一般为path）-
         }]
         threadList为线程列表，格式为
         [{
-            name:xxx,           -线程名称-
-            tag:xx,             -保存线程类型（下载线程/检查线程）-
-            now:xxxx,           -当前状态-
-            time_start:xxxx,    -线程开始时间-
-            goal:xxx,           -任务路径path-
-            thread:xx,          -线程时间限制-
+            name:xxx,               -线程名称-
+            tag:xx,                 -保存线程类型（下载线程/检查线程）-
+            now:xxxx,               -当前状态-
+            time_start:xxxx,        -线程开始时间-
+            goal:xxx,               -任务路径path-
+            thread:xx,              -线程时间限制-
         }]
         
 
@@ -90,7 +92,9 @@ class down():
         log         :错误输出控制
         tick        :状态更新间隔
         timeOut     :超时时间
+        reDownMax   :最大重复下载次数
         file_history:下载历史记录-json
+    
         --变量说明--
         '''
         self.header = []
@@ -107,7 +111,9 @@ class down():
         self.log = False
         self.tick = 0.5
         self.timeOut = 4
+        self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
+        
     
     def start(self):
         '''
@@ -175,6 +181,7 @@ class down():
     def workProcess(self,tag,name):
         '''
         工作进程
+        自动询问任务
         下载失败之后自动把失败任务重新添加到下载队列中
         '''
         deal = {}
@@ -200,7 +207,7 @@ class down():
                 continue
             else:
                 if not self.downLoad(deal['url'],deal['path'],tag):
-                    self.addMission(deal['url'],deal['path'])
+                    self.addMission(deal['url'],deal['path'],deal['reDown']+1)
 
     def changeStatusByTag(self,tag,status_tag1,status_tag2):
         for x in range(len(self.status)):
@@ -240,7 +247,7 @@ class down():
             self.logTag("error<<saveHistory>>:保存失败//path="+self.file_history)
         
     
-    def addMission(self,url,path):
+    def addMission(self,url,path,reDown = 0):
         '''
         加入一个新的任务
         '''
@@ -248,24 +255,27 @@ class down():
             path = str(path)
             url = str(url)
             self.taskNum = self.taskNum + 1
-            self.taskList.append({
+            task = {
                 'path':path,
                 'url':url,
                 'isCheck':False,
-                'isDown':False
-            })
+                'isDown':False,
+                'reDown':reDown
+            }
+            self.taskList.append(task)
         except:
-            self.logTag("error : 任务添加失败 path:"+path+' url: '+url)
+            self.logTag("error : 任务添加失败 reDown:"+str(reDown)+' url: '+url+' path: '+path)
             return False
         else:
-            self.logTag("success : 任务添加成功"+"path:"+path+' url: '+url)
+            self.logTag("success : 任务添加成功 reDown:"+str(reDown)+' url: '+url+' path: '+path)
             return True
 
     def downLoad(self,url,path,tag):
         ''' 
         下载一张图片/需要对应路径
         单线程下载
-        超时控制
+        超时控制 
+        按照区块下载并给出进度
         '''
         try:
             path = self.pathDeal(path)
