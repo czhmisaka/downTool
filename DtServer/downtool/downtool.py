@@ -26,7 +26,7 @@ def clearShellinWin():
     max:clear
     win:cls
     '''
-    os.system("cls")
+    os.system("clear")
 
 def getUa(type):
     '''
@@ -300,7 +300,7 @@ class down():
         '''
         清屏/终端用 win
         '''
-        os.system("cls")
+        os.system("clear")
 
     def openWebServer(self):
         '''
@@ -334,36 +334,7 @@ class down():
             self.chat.on('onupdate', _onupdate)
             self.chat.emit('checkStatus',"ok")
             while True:
-                socket.wait(seconds=1)
-            # while self.serverStatus:
-            #     task = {
-            #     }
-            #     data = {
-            #         "tasks" :json.dumps(self.tasks)
-            #     }
-            #     try:
-            #         res = requests.post(url="http://127.0.0.1:8900/refresh",data=data)
-            #     except Exception as e:
-            #         print(e)
-            #         time.sleep(1)
-            #         continue
-            #     res.encoding = 'utf-8'
-            #     _res = res.content.decode('utf-8')
-            #     if _res != "ok" :
-            #         print(_res)
-            #         _task = json.loads(_res,encoding='utf-8')
-            #         print(_task)
-            #         _task["filename"] = _task["name"]
-            #         _task["per"] = random.randint(0,100)
-            #         self.tasks.append(_task)
-            #         self.addMission(_task["url"],os.path.join('test_file',_task["path"]))
-            #         self.start()
-            #     time.sleep(1)
-
-            # while self.serverStatus:
-            #     tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            #     tcp_client.connect(('localhost',8900))
-                
+                socket.wait(seconds=1)                
         serverThead = threading.Thread(target=_serverThead,args=[])
         self.serverStatus = True
         serverThead.start()

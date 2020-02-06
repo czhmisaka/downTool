@@ -5,7 +5,9 @@ import datetime
 from fake_useragent import UserAgent
 import os
 import json
-
+import random
+import json
+from socketIO_client import SocketIO, BaseNamespace
 '''
 
 请记住，人总是本能的排斥没有创造性的工作
@@ -26,7 +28,7 @@ def clearShellinWin():
     max:clear
     win:cls
     '''
-    os.system("cls")
+    os.system("clear")
 
 def getUa(type):
     '''
@@ -108,6 +110,7 @@ class down():
         self.tick = 0.5
         self.timeOut = 4
         self.file_history = 'DownToolHistory.json'
+        self.tasks = []
     
     def start(self):
         '''
@@ -269,7 +272,7 @@ class down():
         '''
         try:
             path = self.pathDeal(path)
-            pp = requests.get(url,headers = self.header,timeout = self.timeOut)
+            pp = requests.get(url,headers = self.header,timeout = self.timeOut,verify=False)
             if str(pp) ==  "<Response [404]>":
                 self.logTag("Warning 404 : check the url right")
                 return False
@@ -340,7 +343,46 @@ class down():
         '''
         清屏/终端用 win
         '''
-        os.system("cls")
+        os.system("clear")
+    def openWebServer(self):
+        '''
+        向web服务器发送接收数据
+        '''
+        def _serverThead():
+            def _onstart(*args):
+                print("server 连接成功")
+                #self.chat.emit('message',"ok")
+                _onupdate()
+            def _onupdate(*args):
+                if len(args)>0 and args[0].get('code')==3:
+                    _task = args[0]['data']
+                    _task["filename"] = _task["name"]
+                    _task["per"] = random.randint(0,100)
+                    self.tasks.append(_task)
+                    self.addMission(_task["url"],os.path.join('test_file',_task["path"]))
+                else:
+                    pass
+                data = {
+                        "code":1,
+                        "tasks" :[],
+                        "taskNum":self.taskNum,
+                    }
+                for x in range(len(self.status)):
+                    data["tasks"].append({"name":'线程<'+str(x),"status":self.status[x]})
+                time.sleep(1)
+                self.chat.emit('onupdate',data)
+
+            socket = SocketIO('127.0.0.1',8900)
+            self.chat = socket.define(BaseNamespace, '/client')
+            self.chat.on('onstart', _onstart)
+            self.chat.on('onupdate', _onupdate)
+            self.chat.emit('checkStatus',"ok")
+            while True:
+                socket.wait(seconds=1)                
+        serverThead = threading.Thread(target=_serverThead,args=[])
+        self.serverStatus = True
+        serverThead.start()
+        self.start()
 
 class _downTool_commonThread(threading.Thread):
     '''
