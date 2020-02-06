@@ -5,9 +5,7 @@ import datetime
 from fake_useragent import UserAgent
 import os
 import json
-import random
-import json
-from socketIO_client import SocketIO, BaseNamespace
+
 '''
 
 请记住，人总是本能的排斥没有创造性的工作
@@ -96,7 +94,6 @@ class down():
         timeOut     :超时时间
         reDownMax   :最大重复下载次数
         file_history:下载历史记录-json
-        task        :用于提交数据给服务器
 
         --变量说明--
         '''
@@ -117,6 +114,8 @@ class down():
         self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
         self.tasks = []
+
+
     def start(self):
         '''
         启动
@@ -212,6 +211,9 @@ class down():
                     self.addMission(deal['url'],deal['path'],deal['reDown']+1)
 
     def changeStatusByTag(self,tag,status_tag1,status_tag2):
+        '''
+        修改进程状态
+        '''
         for x in range(len(self.status)):
             if self.status[x]['tag']==tag:
                 self.status[x]['now']= str(status_tag1)
@@ -254,17 +256,21 @@ class down():
         加入一个新的任务
         '''
         try:
-            path = str(path)
-            url = str(url)
-            self.taskNum = self.taskNum + 1
-            task = {
-                'path':path,
-                'url':url,
-                'isCheck':False,
-                'isDown':False,
-                'reDown':reDown
-            }
-            self.taskList.append(task)
+            if reDown<self.reDownMax:
+                path = str(path)
+                url = str(url)
+                self.taskNum = self.taskNum + 1
+                task = {
+                    'path':path,
+                    'url':url,
+                    'isCheck':False,
+                    'isDown':False,
+                    'reDown':reDown
+                }
+                self.taskList.append(task)
+            else:
+                self.logTag("error : 任务添加失败 reDown:"+str(reDown)+' url: '+url+' path: '+path)
+                return False
         except:
             self.logTag("error : 任务添加失败 reDown:"+str(reDown)+' url: '+url+' path: '+path)
             return False
@@ -327,6 +333,7 @@ class down():
         except:
             self.logTag("Error:"+datetime.datetime.now+":checkFile:"+path)
             return False
+
     def getDesktopPath(self):
         '''
         获取桌面路径
@@ -354,46 +361,7 @@ class down():
         '''
         os.system("cls")
 
-    def openWebServer(self):
-        '''
-        向web服务器发送接收数据
-        '''
-        def _serverThead():
-            def _onstart(*args):
-                print("server 连接成功")
-                #self.chat.emit('message',"ok")
-                _onupdate()
-            def _onupdate(*args):
-                if len(args)>0 and args[0].get('code')==3:
-                    _task = args[0]['data']
-                    _task["filename"] = _task["name"]
-                    _task["per"] = random.randint(0,100)
-                    self.tasks.append(_task)
-                    self.addMission(_task["url"],os.path.join('test_file',_task["path"]))
-                else:
-                    pass
-                data = {
-                        "code":1,
-                        "tasks" :[],
-                        "taskNum":self.taskNum,
-                    }
-                for x in range(len(self.status)):
-                    data["tasks"].append({"name":'线程<'+str(x),"status":self.status[x]})
-                time.sleep(1)
-                self.chat.emit('onupdate',data)
-
-            socket = SocketIO('127.0.0.1',8900)
-            self.chat = socket.define(BaseNamespace, '/client')
-            self.chat.on('onstart', _onstart)
-            self.chat.on('onupdate', _onupdate)
-            self.chat.emit('checkStatus',"ok")
-            while True:
-                socket.wait(seconds=1)                
-        serverThead = threading.Thread(target=_serverThead,args=[])
-        self.serverStatus = True
-        serverThead.start()
-        self.start()
-
+    
 class _downTool_commonThread(threading.Thread):
     '''
     _downTool_公共线程工具
