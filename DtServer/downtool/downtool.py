@@ -106,7 +106,7 @@ class down():
         self.pool = []
         self.log = False
         self.tick = 0.5
-        self.tasks = {}
+        self.tasks = []
     
     def start(self):
         '''
@@ -302,7 +302,7 @@ class down():
         '''
         os.system("cls")
 
-     def openWebServer(self):
+    def openWebServer(self):
         '''
         向web服务器发送接收数据
         '''
