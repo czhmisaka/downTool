@@ -66,8 +66,8 @@ class down():
         }]
         threadList为线程列表，格式为
         [{
-            name:xxx,               -线程名称-
-            tag:xx,                 -保存线程类型（下载线程/检查线程）-
+            name:xxx,               -线程类型-
+            tag:xx,                 -线程编号-
             now:xxxx,               -当前状态-
             time_start:xxxx,        -线程开始时间-
             goal:xxx,               -任务路径path-
