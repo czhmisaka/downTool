@@ -5,6 +5,8 @@ import time
 import requests
 
 a = DtServerApi()
-a.startByWebServer()
+a.start()
+a.getHistory()
+# a.startByWebServer()
 
  

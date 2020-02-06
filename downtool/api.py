@@ -17,7 +17,7 @@ class DtServerApi(down):
     '''
     def startByWebServer(self):
         '''
-        向web服务器发送接收数据
+        向web服务器发送接收数据 
         '''
         def _serverThead():
             def _onstart(*args):
