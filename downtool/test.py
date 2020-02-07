@@ -7,6 +7,6 @@ import requests
 a = DtServerApi()
 a.start()
 a.getHistory()
-# a.startByWebServer()
+a.startByWebServer()
 
  

@@ -3,8 +3,8 @@ from socketIO_client import SocketIO, BaseNamespace
 import json
 import random
 import threading
-
-
+import time
+import os
 
 
 class DtServerApi(down):
@@ -15,6 +15,7 @@ class DtServerApi(down):
 
     --变量说明--
     '''
+
     def startByWebServer(self):
         '''
         向web服务器发送接收数据 
@@ -42,7 +43,6 @@ class DtServerApi(down):
                     data["tasks"].append({"name":'线程<'+str(x),"status":self.status[x]})
                 time.sleep(1)
                 self.chat.emit('onupdate',data)
-
             socket = SocketIO('127.0.0.1',8900)
             self.chat = socket.define(BaseNamespace, '/client')
             self.chat.on('onstart', _onstart)

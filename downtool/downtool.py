@@ -26,7 +26,7 @@ def clearShellinWin():
     max:clear
     win:cls
     '''
-    os.system("clear")
+    #os.system("clear")
 
 def getUa(type):
     '''
@@ -359,7 +359,7 @@ class down():
         '''
         清屏/终端用 win
         '''
-        os.system("cls")
+        #os.system("cls")
 
     
 class _downTool_commonThread(threading.Thread):
