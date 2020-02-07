@@ -55,7 +55,7 @@ class down():
             url:str,                -目标下载链接-
             isDown:bool,            -确认是否被下载过-
             isCheck:bool,           -确认是否被检查过-
-            reDown:int            -重复添加次数/避免重复下载错误文件
+            reDown:int,             -重复添加次数/避免重复下载错误文件
         }]
         status为线程状态，格式为
         [{
@@ -114,7 +114,7 @@ class down():
         self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
         self.tasks = []
-
+        self.chunk_size = 1024
 
     def start(self):
         '''
@@ -260,7 +260,7 @@ class down():
                 path = str(path)
                 url = str(url)
                 self.taskNum = self.taskNum + 1
-                task = {
+                task = {  
                     'path':path,
                     'url':url,
                     'isCheck':False,
@@ -283,7 +283,6 @@ class down():
         下载一张图片/需要对应路径
         单线程下载
         超时控制 
-        按照区块下载并给出进度
         '''
         try:
             path = self.pathDeal(path)
@@ -301,9 +300,42 @@ class down():
                 return True
         except:
             self.changeStatusByTag(tag,'超时',path)
-            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
             return False
-            
+
+    def downLoad_LSize(self,url,path,tag):
+        '''
+        下载一个文件/需要对应路径
+        多线程下载
+        超时控制 
+        按照区块下载并给出进度
+        '''
+        try:
+            header = {'Proxy-Connection':'keep-alive'}
+            r = requests.get(url, stream=True, headers=headers)
+            length = float(r.headers['content-length'])
+            f = open(path, 'wb')
+            count = 0
+            count_tmp = 0
+            time1 = time.time()
+            for chunk in r.iter_content(chunk_size = self.chunk_size):
+                if chunk:
+                    f.write(chunk)
+                    count += len(chunk)
+                    if time.time() - time1 > 2:
+                        p = count / length * 100
+                        speed = (count - count_tmp) / 1024 / 1024 / 2
+                        count_tmp = count
+                        time1 = time.time()
+            f.close()
+            return True
+        except:
+            self.changeStatusByTag(tag,'超时',path)
+            self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+            return False
+
+    def __formatFloat(self,num):
+        return '{:.2f}'.format(num)    
 
     def mkdirFile(self,path):
         '''

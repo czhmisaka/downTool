@@ -4,9 +4,9 @@ import datetime
 import time
 import requests
 
-a = DtServerApi()
-a.start()
-a.getHistory()
+# a = DtServerApi()
+# a.start()
+# # a.getHistory()
+# a.log = True
+# a.tick = 20
 # a.startByWebServer()
-
- 
