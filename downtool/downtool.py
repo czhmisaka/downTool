@@ -207,8 +207,7 @@ class down():
                 self.changeStatusByTag(tag,'完成下载',deal['path'])
                 continue
             else:
-                if not self.downLoad(deal['url'],deal['path'],tag):
-                    self.addMission(deal['url'],deal['path'],deal['reDown']+1)
+                self.addMission(deal['url'],deal['path'],deal['reDown']+1)
 
     def changeStatusByTag(self,tag,status_tag1,status_tag2):
         '''
