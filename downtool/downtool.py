@@ -309,10 +309,11 @@ class down():
         多线程下载
         超时控制 
         按照区块下载并给出进度
+        留个坑/使用更加优雅的with
         '''
         try:
             header = {'Proxy-Connection':'keep-alive'}
-            r = requests.get(url, stream=True, headers=headers)
+            r = requests.get(url, stream=True, headers=self.header)
             length = float(r.headers['content-length'])
             f = open(path, 'wb')
             count = 0
@@ -322,11 +323,13 @@ class down():
                 if chunk:
                     f.write(chunk)
                     count += len(chunk)
-                    if time.time() - time1 > 2:
-                        p = count / length * 100
-                        speed = (count - count_tmp) / 1024 / 1024 / 2
-                        count_tmp = count
-                        time1 = time.time()
+                    print(count)
+                    # if time.time() - time1 > 2:
+                    p = count / length * 100
+                    speed = (count - count_tmp) / 1024 / 1024 / 2
+                    count_tmp = count
+                    time1 = time.time()
+                    print(speed)
             f.close()
             return True
         except:
