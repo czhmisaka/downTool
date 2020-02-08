@@ -46,13 +46,14 @@ def getUa(type):
 
 
 class down():
-    def __init__(self):
+    def __init__(self): 
         '''
         --downtool--
         taskList为任务队列，格式为
         [{
             path:str,               -文件保存路径-
             url:str,                -目标下载链接-
+            isLarge:bool            -是否启用大文件下载（downloat_LSize）-
             isDown:bool,            -确认是否被下载过-
             isCheck:bool,           -确认是否被检查过-
             reDown:int,             -重复添加次数/避免重复下载错误文件
@@ -63,6 +64,7 @@ class down():
             'now':'wait',           -线程状态-
             'rate':int              -当前任务进度（0~100）-
             'goal':''               -线程任务目标（一般为path）-
+            'speed':''              -当前下载速度（大文件才会有）-
         }]
         threadList为线程列表，格式为
         [{
@@ -114,7 +116,7 @@ class down():
         self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
         self.tasks = []
-        self.chunk_size = 1024
+        self.chunk_size = 10240
 
     def start(self):
         '''
@@ -203,13 +205,13 @@ class down():
                 self.taskKey = self.taskKey + 1
                 self.lock.release()
             self.changeStatusByTag(tag,'开始下载',deal['path'])
-            if self.downLoad(deal['url'],deal['path'],tag):
+            if self.__downLoadStart(deal['url'],deal['path'],tag,deal['isLarge']):
                 self.changeStatusByTag(tag,'完成下载',deal['path'])
                 continue
             else:
-                self.addMission(deal['url'],deal['path'],deal['reDown']+1)
+                self.addMission(deal['url'],deal['path'],deal['reDown']+1,deal['isLarge'])
 
-    def changeStatusByTag(self,tag,status_tag1,status_tag2):
+    def changeStatusByTag(self,tag,status_tag1,status_tag2,status_speed='无',status_process =' '):
         '''
         修改进程状态
         '''
@@ -217,6 +219,10 @@ class down():
             if self.status[x]['tag']==tag:
                 self.status[x]['now']= str(status_tag1)
                 self.status[x]['goal']= str(status_tag2)
+                self.status[x]['speed'] = str(status_speed)
+                self.status[x]['rate'] = str(status_process)
+                
+
 
     def getHistory(self):
         '''
@@ -250,7 +256,7 @@ class down():
             self.logTag("error<<saveHistory>>:保存失败//path="+self.file_history)
         
     
-    def addMission(self,url,path,reDown = 0):
+    def addMission(self,url,path,reDown = 0,isLarge = False):
         '''
         加入一个新的任务
         '''
@@ -262,6 +268,7 @@ class down():
                 task = {  
                     'path':path,
                     'url':url,
+                    'isLarge':isLarge,
                     'isCheck':False,
                     'isDown':False,
                     'reDown':reDown
@@ -276,6 +283,12 @@ class down():
         else:
             self.logTag("success : 任务添加成功 reDown:"+str(reDown)+' url: '+url+' path: '+path)
             return True
+    
+    def __downLoadStart(self,url,path,tag,isLarge):
+        if isLarge:
+            return self.downLoad_LSize(url,path,tag)
+        elif isLarge == False:
+            return self.downLoad(url,path,tag)
 
     def downLoad(self,url,path,tag):
         ''' 
@@ -297,10 +310,15 @@ class down():
                         f.write(chunk)
                 self.logTag("路径："+path+"下载好。")
                 return True
-        except:
-            self.changeStatusByTag(tag,'超时',path)
+        except TimeoutError:
+            self.changeStatusByTag(tag,'下载超时',path)
             self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
             return False
+        except:
+            self.changeStatusByTag(tag,'其他错误',path)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
+            return False
+
 
     def downLoad_LSize(self,url,path,tag):
         '''
@@ -311,6 +329,7 @@ class down():
         留个坑/使用更加优雅的with
         '''
         try:
+            self.logTag("正在下载 "+url+" 为 "+path)
             header = {'Proxy-Connection':'keep-alive'}
             r = requests.get(url, stream=True, headers=self.header)
             length = float(r.headers['content-length'])
@@ -322,18 +341,23 @@ class down():
                 if chunk:
                     f.write(chunk)
                     count += len(chunk)
-                    print(count)
-                    # if time.time() - time1 > 2:
-                    p = count / length * 100
-                    speed = (count - count_tmp) / 1024 / 1024 / 2
-                    count_tmp = count
-                    time1 = time.time()
-                    print(speed)
+                    if time.time()-time1 > 0.2:
+                        p = count / length * 100
+                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.2)
+                        count_tmp = count
+                        self.changeStatusByTag(tag,'正在下载',path,str(speed)+'Mb/s',str(int(count/length*100))+'%')
+                        time1 = time.time()
+                if not self.key_Keep:
+                    break
             f.close()
             return True
-        except:
+        except TimeoutError:
             self.changeStatusByTag(tag,'超时',path)
             self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+            return False
+        except:
+            self.changeStatusByTag(tag,'其他错误',path)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
             return False
 
     def __formatFloat(self,num):
@@ -393,7 +417,7 @@ class down():
         '''
         清屏/终端用 win
         '''
-        #os.system("cls")
+        os.system("cls")
 
     
 class _downTool_commonThread(threading.Thread):
