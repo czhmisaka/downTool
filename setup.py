@@ -5,7 +5,7 @@ with open("README.md", "r",encoding='utf-8') as fh:
 
 setuptools.setup(
     name="downtool", 
-    version="0.1.2",
+    version="0.1.3",
     author="chen zhihan&xu chengbo",
     license='MIT Licence',
     author_email="im.czh@qq.com",
@@ -19,6 +19,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['requests','fake_useragent','datetime'],
+    install_requires=['requests'],
     python_requires='>=3.6',
 ) 

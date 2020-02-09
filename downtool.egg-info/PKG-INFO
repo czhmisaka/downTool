@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: downtool
-Version: 0.1.2
+Version: 0.1.3
 Summary: a downtool for everyone who want to have a good experience with Crawling every image wanted.
 Home-page: https://github.com/czhmisaka/downtool
 Author: chen zhihan&xu chengbo
@@ -18,15 +18,21 @@ Description: # -*- coding: utf-8
         	b. 文件大小检查   		                    
         4. 多线程下载/下载线程							  --完成			           
         	a. 超时控制
+        	b. 多线程下载一个大文件（完成）
         5. 生成下载列表，保存下载历史					  --完成		
         6. 下载器界面                                    --未完成
         	a. 图形化界面
         	b. 终端进度显示					
         7. 可控制的错误输出							       --完成
         8. 提供人性化（英语白痴般）的注释	                --我觉得是可以了
-        9. 提供测试方式									  --未完成
+        9. 提供测试方式									  --难以说服自己的完成度
         10. 提供一个pypi可下载的版本					   --完成
-        
+        11. 进度条										 --完成-提供了进度显示
+        	a. vue
+        	b. 终端
+        12. IP代理池
+        13. 默认的下载路径+自定义下载路径的方式				--未完成
+        14. 大文件断点续传/下载检查						   --未完成				
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License

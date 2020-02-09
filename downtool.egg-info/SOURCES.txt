@@ -1,6 +1,7 @@
 README.md
 setup.py
 downtool/__init__.py
+downtool/api.py
 downtool/downtool.py
 downtool/test.py
 downtool.egg-info/PKG-INFO
