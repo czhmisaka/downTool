@@ -10,6 +10,7 @@ import requests
 # a.startByWebServer()
 
 a = down()
+# a.log = True
 # a.threadMaxNum = 10
 # # a.getHistory()
 # a.addMission('https://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4','../1.mp4',isLarge=True)
@@ -18,12 +19,22 @@ a = down()
 #     '../downloadBydowntool/'+str(x)+'.jpg')
 # a.tick = 0.125
 # a.start()
-# # a.chunk_size = 128
+# a.chunk_size = 128
 # time.sleep(10)
 # a.stop()    
 
-a.addLargeSizeFile('https://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4','railgun',isLarge=True)
-
+# a.log = True
+a.addMission('http://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4',
+fileName='railgun.mp4',isLarge=True)
+time.sleep(1)
+print(123)
+print(a.taskKey)
+print(a.taskList)
+print(len(a.taskList))
+# a.stop()
+# a.workProcess('1','work-1')
+# time.sleep(1)
+# a.stop()
 # a.downLoad_LSize('https://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4','../360.','1')
 
 # a = down()
