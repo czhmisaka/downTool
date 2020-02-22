@@ -114,7 +114,7 @@ class down():
         self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
         self.chunk_size = 10240
-        self.block_size = 10485760  # 1024^2*10
+        self.block_size = 1024*1024*15  # 1024^2*10
         self.path = self.__getDesktopPath()+'/downloadByDowntool/'
 
     def start(self,stopWhenFinish = False):
@@ -142,7 +142,7 @@ class down():
             self.status.append(status)
         for x in self.threadList:
             self.workProcess_create(x)
-        self.helper = _downTool_commonThread(self.statusPrint,(),'0')
+        self.helper = _downTool_commonThread(self.statusPrint,(),'0') 
         self.helper.start()
 
     def stop(self):
@@ -153,7 +153,7 @@ class down():
         self.saveHistory()
 
     def statusPrint(self):
-        '''
+        ''' 
         下载状态显示（暂定）
         目前使用终端显示，希望之后可以改成用vue的界面显示
         留个坑
@@ -192,6 +192,7 @@ class down():
         '''
         deal = {}
         while(self.key_Keep):
+        # while(self.taskKey<=self.taskNum):
             self.lock.acquire()
             if self.taskNum==0:
                 self.lock.release()
@@ -199,8 +200,6 @@ class down():
                 time.sleep(1)
                 continue
             elif self.taskKey>=self.taskNum:
-                # if self.stopWhenFinish:
-                #     self.stop()
                 self.lock.release()
                 self.__changeStatusByTag(tag,'等待任务','')
                 time.sleep(1)
@@ -296,7 +295,7 @@ class down():
                     'BlockList':BlockList,
                     'filePath':[]
                 })
-                # self.logTag(BlockList)
+                self.logTag(BlockList)
                 for x in BlockList:
                     task = {
                         'path':path,
@@ -345,12 +344,11 @@ class down():
         '''
         下载前判断   
         ''' 
-        # self.logTag(deal)
-        if isLarge:
-            # print('task',self.taskList)
+        self.logTag(deal)
+        if isLarge == True:
             start = deal['start']
             end = deal['end']
-            # path = path+self.__getFileTypeByUrl(deal['fileName'],url)
+            path = path+'/'+deal['fileName']
             return self.downLoad_LSize(url,path,tag,start,end)                    
         else:
             return self.downLoad(url,path,tag)
@@ -364,51 +362,11 @@ class down():
         按照区块下载并给出进度
         留个坑/使用更加优雅的with
         '''
-        try:
-            self.logTag("正在下载 "+url+" 为 "+path)
-            header = {'Proxy-Connection':'keep-alive'}
-            r = requests.get(url, stream=True, headers= header)
-            length = float(r.headers['content-length'])
-            f = open(path, 'wb')
-            count = 0
-            count_tmp = 0
-            time1 = time.time()
-            for chunk in r.iter_content(chunk_size = 2048):
-                if chunk:
-                    f.write(chunk)
-                    count += len(chunk)
-                    if time.time()-time1 > 0.25:
-                        p = count / length * 100
-                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
-                        count_tmp = count
-                        self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
-                        time1 = time.time()
-                if not self.key_Keep:
-                    '''
-                    stop函数执行,下载终止。
-                    '''
-                    break
-            f.close()
-            return True
-        except TimeoutError:
-            self.__changeStatusByTag(tag,'超时',path)
-            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
-            return False
-        except:
-            self.__changeStatusByTag(tag,'其他错误',path)
-            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
-            return False
-        
-    def downLoad_LSize(self,url,path,tag,start,end):
-        '''
-        使用分块下载的方式下载一个大文件
-        下载之后需要在对应的json 文件内修改下载属性
-        '''
         # try:
-        header = {'Proxy-Connection':'keep-alive','range':'bytes='+ str(start) +'-'+ str(end)}
-        r = requests.get(url, stream=True, headers = header)
+        self.logTag("正在下载 "+url+" 为 "+path)
+        header = {'Proxy-Connection':'keep-alive'}
+        r = requests.get(url, stream=True, headers= header)
         length = float(r.headers['content-length'])
-        print(path)
         f = open(path, 'wb')
         count = 0
         count_tmp = 0
@@ -429,15 +387,60 @@ class down():
                 '''
                 break
         f.close()
-        
+        return True
         # except TimeoutError:
         #     self.__changeStatusByTag(tag,'超时',path)
-        #     self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+        #     self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
         #     return False
         # except:
         #     self.__changeStatusByTag(tag,'其他错误',path)
-        #     self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+        #     self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
         #     return False
+        
+    def downLoad_LSize(self,url,path,tag,start,end):
+        '''
+        使用分块下载的方式下载一个大文件
+        下载之后需要在对应的json 文件内修改下载属性
+        '''
+        try:
+            header = {'Proxy-Connection':'keep-alive','range':'bytes='+ str(start) +'-'+ str(end)}
+            r = requests.get(url, stream=True, headers = header)
+            length = float(r.headers['content-length'])
+            count = 0
+            count_tmp = 0
+            time1 = time.time()
+            F_start = start
+            for chunk in r.iter_content(chunk_size=self.chunk_size):
+                if chunk:
+                    self.lock.acquire()
+                    with open(path, 'ab+') as f:
+                        f.seek(F_start,0)     
+                        f.write(chunk)
+                    self.lock.release()
+                    F_start += len(chunk)
+                    count += len(chunk)
+                    if time.time()-time1 > 0.25:
+                        p = count / length * 100
+                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
+                        count_tmp = count
+                        self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
+                        time1 = time.time()
+            return True
+        except TimeoutError:
+            self.__changeStatusByTag(tag,'超时',path)
+            self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+            return False
+        except:
+            self.__changeStatusByTag(tag,'其他错误',path)
+            self.logTag("Error<<downLoad_LSize()>> -path:"+path+"-url:"+url)  
+            return False
+
+    def writeFile(self,start,data,path):
+        try:
+            with open(path,'ab+') as f:
+                f.seek(start)
+                f.write(data)
+        except:
 
     def __formatFloat(self,num):
         '''
@@ -536,7 +539,7 @@ class down():
             size = os.path.getsize(path)
             return size
         else:
-            return 0
+            return 'warning : no path'
 
     def __getDesktopPath(self):
         '''
