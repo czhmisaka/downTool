@@ -19,24 +19,6 @@ def printList(arr):
     for x in arr:
         print(x)
 
-
-# def getUa(type):
-#     '''
-#     获取一个对应浏览器类型的header
-#     '''
-#     ua = UserAgent()
-#     if type == 'chrome':
-#         return ua.chrome
-#     elif type == 'ie':
-#         return ua.ie
-#     elif type == 'opera':
-#         return ua.opera
-#     else:
-#         print("Warning : No headers with "+type)
-#         return []
-
-
-
 class down():
     def __init__(self): 
         '''
