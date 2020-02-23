@@ -65,7 +65,7 @@ class down():
             -Key    : 当前已创建下载的任务数量
             -CheckKey:当前已检查的任务数量
             -num    : 当前任务列表的长度（任务数量）
-        key_Keep    : bool/False停止创建新的下载进程
+        key_Keep    : bool/设置为False停止创建新的下载进程
         lock        : 进程锁/目前还没有什么用 
         log         : 错误输出控制
         tick        : 状态更新间隔
@@ -382,7 +382,7 @@ class down():
     def downLoad_LSize(self,url,path,tag,start,end):
         '''
         使用分块下载的方式下载一个大文件
-        下载之后需要在对应的json 文件内修改下载属性
+        下载之后需要在对应的json文件内修改下载属性
         '''
         try:
             header = {'Proxy-Connection':'keep-alive','range':'bytes='+ str(start) +'-'+ str(end)}
@@ -395,7 +395,7 @@ class down():
             for chunk in r.iter_content(chunk_size=self.chunk_size):
                 if chunk:
                     self.lock.acquire()
-                    with open(path, 'ab+') as f:
+                    with open(path, 'rb+') as f:
                         f.seek(F_start,0)     
                         f.write(chunk)
                     self.lock.release()
@@ -423,6 +423,8 @@ class down():
                 f.seek(start)
                 f.write(data)
         except:
+            return False
+            
 
     def __formatFloat(self,num):
         '''
@@ -505,13 +507,29 @@ class down():
         '''
         try:
             path = self.__pathDeal(path)
-            if not os.path.exists(path):
+            if os.path.exists(path):
                 return True
             else:
                 return False
         except:
             self.logTag("Error:"+str(time.time())+":checkFile:"+path)
             return False
+
+    def __checkFile_WithCreate(self,path):
+        '''
+        检查文件是否存在
+        若不存在则创建
+        '''
+        if self.__checkFile(path):
+            # self.log(path)
+            # print(path)
+            return True
+        else:
+            f = open(path,'w')
+            f.close()
+            return True
+            
+            
 
     def __checkFileSize(self,path):
         '''
@@ -521,7 +539,7 @@ class down():
             size = os.path.getsize(path)
             return size
         else:
-            return 'warning : no path'
+            return False
 
     def __getDesktopPath(self):
         '''

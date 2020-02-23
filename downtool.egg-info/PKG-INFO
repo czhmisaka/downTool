@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: downtool
-Version: 0.1.3
+Version: 0.1.4
 Summary: a downtool for everyone who want to have a good experience with Crawling every image wanted.
 Home-page: https://github.com/czhmisaka/downtool
 Author: chen zhihan&xu chengbo
@@ -33,6 +33,7 @@ Description: # -*- coding: utf-8
         12. IP代理池
         13. 默认的下载路径+自定义下载路径的方式				--未完成
         14. 大文件断点续传/下载检查						   --未完成				
+        15. 合并了任务添加函数
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License

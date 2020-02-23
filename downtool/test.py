@@ -35,10 +35,13 @@ a.start()
 
 # path = "C:/Users/Administrator/Desktop/downloadByDowntool/a.txt"
 # qwe = 0
+# a.log = True
+# a.checkFile_WithCreate(path)
 
 # for x in range(10):
-#     f = open(path,'rb   +')
-#     f.seek(qwe)
+#     with open(path,'ab+') as f:
+#     f.seek(qwe,0)
+#     print(f.tell())
 #     f.write(str(x).encode())
+#     # print(f.write(str(x).encode()))
 #     qwe+=10
-#     f.close()
