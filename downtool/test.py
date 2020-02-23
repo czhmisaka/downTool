@@ -16,14 +16,18 @@ def printList(arr):
 
 a = down()
 # a.log = True
-a.tick = 0.2
+a.tick = 0.25
 # a.chunk_size = 512
 # a.block_size = 1024*2
 # a.addMission('https://src.mcool.com/data/attachment/forum/201903/20/172120zye5g57vmm55h7rs.jpg-view',
 # fileName="1.jpg",isLarge=True)
 a.addMission('http://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4',
 fileName='railgun.mp4',isLarge=True)
-a.threadMaxNum = 10
+a.addMission('http://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4',
+fileName='railgun1.mp4',isLarge=True)
+a.addMission('http://gss3.baidu.com/6LZ0ej3k1Qd3ote6lo7D0j9wehsv/tieba-smallvideo/60_ffac01879bef560ae47131a97a5f65fa.mp4',
+fileName='railgun2.mp4',isLarge=True)
+a.threadMaxNum = 20
 # printList(a.taskList)
 # a.workProcess('a','asd')
 a.start()

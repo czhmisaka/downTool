@@ -96,7 +96,7 @@ class down():
         self.reDownMax = 10
         self.file_history = 'DownToolHistory.json'
         self.chunk_size = 10240
-        self.block_size = 1024*1024*15  # 1024^2*10
+        self.block_size = 1024*1024*5  # 1024^2*10
         self.path = self.__getDesktopPath()+'/downloadByDowntool/'
 
     def start(self,stopWhenFinish = False):
@@ -392,6 +392,7 @@ class down():
             count_tmp = 0
             time1 = time.time()
             F_start = start
+            self.__checkFile_WithCreate(path)
             for chunk in r.iter_content(chunk_size=self.chunk_size):
                 if chunk:
                     self.lock.acquire()
