@@ -23,7 +23,7 @@ class down():
     def __init__(self): 
         '''
         --downtool--
-        taskList为下载任务队列，格式有两种
+        taskList为下载任务队列，格式有两种/待更新
         [{
             'path':str,                 -文件保存路径-
             'url':str,                  -目标下载链接-
@@ -31,6 +31,14 @@ class down():
             'isDown':bool,              -确认是否被下载过-
             'isCheck':bool,             -确认是否被检查过-
             'reDown':int,               -重复添加次数/避免重复下载错误文件
+        },{
+            'path':str,                 -文件保存路径-
+            'url':str,                  -目标下载链接-
+            'isLarge':bool              -是否启用大文件下载（downloat_LSize，True）-
+            'isDown':bool,              -确认是否被下载过-
+            'isCheck':bool,             -确认是否被检查过-
+            'reDown':int,               -重复添加次数/避免重复下载错误文件
+            'fileName': str             -文件名称（可以用于识别文件对象）-
         }]
         status为线程状态，格式为 
         [{
@@ -154,7 +162,6 @@ class down():
                 print(self.status[x]) 
             time.sleep(self.tick)
             
-
     def workProcess_create(self,threadStatus):
         '''
         创建工作进程/下载
@@ -211,7 +218,6 @@ class down():
                 self.status[x]['speed'] = str(status_speed)
                 self.status[x]['rate'] = str(status_process)
 
-
     def getHistory(self):
         '''
         读取下载历史
@@ -229,7 +235,6 @@ class down():
         except :
             self.logTag('error<<getHistory>>:读取失败//path'+self.file_history)
         
-
     def saveHistory(self):
         '''
         保存下载历史
@@ -244,7 +249,6 @@ class down():
         except:
             self.logTag("error<<saveHistory>>:保存失败//path="+self.file_history)
         
-    
     def addMission(self,url,path = '',fileName = '',reDown = 0,isLarge = False):
         '''
         加入一个新的任务/小任务
@@ -334,7 +338,6 @@ class down():
             return self.downLoad_LSize(url,path,tag,start,end)                    
         else:
             return self.downLoad(url,path,tag)
-
     
     def downLoad(self,url,path,tag):
         '''
@@ -346,13 +349,13 @@ class down():
         '''
         # try:
         self.logTag("正在下载 "+url+" 为 "+path)
-        header = {'Proxy-Connection':'keep-alive'}
-        r = requests.get(url, stream=True, headers= header)
-        length = float(r.headers['content-length'])
-        f = open(path, 'wb')
         count = 0
         count_tmp = 0
         time1 = time.time()
+        header = {'Proxy-Connection':'keep-alive'}
+        length = float(r.headers['content-length'])
+        r = requests.get(url, stream=True, headers= header)
+        f = open(path, 'wb')
         for chunk in r.iter_content(chunk_size = 2048):
             if chunk:
                 f.write(chunk)
@@ -426,7 +429,6 @@ class down():
         except:
             return False
             
-
     def __formatFloat(self,num):
         '''
         用于获取限位的float数值
@@ -469,6 +471,7 @@ class down():
             return data
         except :
             return False
+
     def __getFileSizeByRequest(self,url):
         '''
         获取待下载文件的大小
@@ -498,9 +501,7 @@ class down():
             i+=self.block_size
             i+=1
         return sizeList
-            
-            
-
+    
     def __checkFile(self,path):
         '''
         单个下载文件的检查
@@ -528,9 +529,7 @@ class down():
         else:
             f = open(path,'w')
             f.close()
-            return True
-            
-            
+            return True           
 
     def __checkFileSize(self,path):
         '''
