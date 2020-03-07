@@ -194,7 +194,7 @@ class down():
             if self.__downLoadStart(deal['url'],deal['path'],tag,deal['isLarge'],deal):
                 self.__changeStatusByTag(tag,'完成下载',deal['path'])
                 continue
-            else:
+            else: 
                 if deal['isLarge']==False:
                     self.addMission(deal['url'],path = deal['path'],reDown = deal['reDown']+1,isLarge = deal['isLarge'])
                 elif deal['isLarge']==True:
