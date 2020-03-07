@@ -545,7 +545,7 @@ class down():
         '''
         获取桌面路径
         '''
-        return os.path.join(os.path.expanduser('~'),"Desktop")
+        return os.path.join(os.path.expanduser('~'),"Desktop")+'/'
         
     def __pathDeal(self,path):
         '''
