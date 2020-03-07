@@ -18,7 +18,7 @@ a = down()
 # 创建了一个下载器对象
 a.path = os.path.join(os.path.expanduser('~'),"Desktop") + "download"
 # 设置下载路径
-a.log = True
+a.log = False
 # 控制错误输出-True 完整输出/False 只显示下载器运行状态
 a.tick = 0.25
 # 终端显示程序的刷新间隔 单位（s）
