@@ -23,11 +23,11 @@ a.log = False
 a.tick = 0.25
 # 终端显示程序的刷新间隔 单位（s）
 a.block_size = 1024*1024*50
-a.addMission('https://dl.google.com/dl/android/studio/install/3.5.2.0/android-studio-ide-191.5977832-windows.exe',
+a.addMission('https://developer.download.nvidia.cn/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_441.22_win10.exe',
 fileName='railgun.exe',path='',isLarge=True)
 # 添加了一个分块下载的任务
 # 其中path 为选填项，若填写则按照这里的path去写入文件
-a.threadMaxNum = 10
+a.threadMaxNum = 50
 # 控制线程数量
 a.start()
 # 下载器启动
