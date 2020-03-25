@@ -27,7 +27,7 @@ a.addMission('https://developer.download.nvidia.cn/compute/cuda/10.2/Prod/local_
 fileName='railgun.exe',path='',isLarge=True)
 # 添加了一个分块下载的任务
 # 其中path 为选填项，若填写则按照这里的path去写入文件
-a.threadMaxNum = 50
+a.threadMaxNum = 10
 # 控制线程数量
 a.start()
 # 下载器启动
