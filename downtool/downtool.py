@@ -154,9 +154,10 @@ class down():
             self.clearShellinWin()
             print('当前状态:',end=' : ')
             print(self.helper)
-            print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey),end='  [ 当前下载总速：')
-            print(self.speed(),end=' ] \n')
-            print("[ 当前工作线程数： "+self.activeThread()+' ]')
+            print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
+            print("[ 当前任务进度: "+str(round(self.taskKey/self.taskNum*100,3))+'% ]')
+            print("[ 当前下载总速: "+self.speed()+' ]')
+            print("[ 当前工作线程利用率: "+self.activeThread()+' ]')
             if self.log:
                 for i in range(len(self.threadList)):
                     print(i,end=' : ')
@@ -172,7 +173,7 @@ class down():
         for x in self.status:
             if x['now']=='正在下载':
                 num = num + 1
-        return str(num)
+        return str(round(num/len(self.status)*100,3))+' %'
 
     def speed(self):
         speed = 0
@@ -181,7 +182,7 @@ class down():
             if(case[0]):
                 speed = speed + float(case[0])
         speed = round(speed,3)
-        return ' '+str(speed) +' MB/s'
+        return str(speed) +' MB/s'
 
     def workProcess_create(self,threadStatus):
         '''
@@ -368,40 +369,40 @@ class down():
         按照区块下载并给出进度
         留个坑/使用更加优雅的with
         '''
-        # try:
-        self.logTag("正在下载 "+url+" 为 "+path)
-        count = 0
-        count_tmp = 0
-        time1 = time.time()
-        header = {'Proxy-Connection':'keep-alive'}
-        r = requests.get(url, stream=True, headers= header)
-        length = float(r.headers['content-length'])
-        f = open(path, 'wb')
-        for chunk in r.iter_content(chunk_size = 2048):
-            if chunk:
-                f.write(chunk)
-                count += len(chunk)
-                if time.time()-time1 > 0.25:
-                    p = count / length * 100
-                    speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
-                    count_tmp = count
-                    self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
-                    time1 = time.time()
-            if not self.key_Keep:
-                '''
-                stop函数执行,下载终止。
-                '''
-                break
-        f.close()
-        return True
-        # except TimeoutError:
-        #     self.__changeStatusByTag(tag,'超时',path)
-        #     self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
-        #     return False
-        # except:
-        #     self.__changeStatusByTag(tag,'其他错误',path)
-        #     self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
-        #     return False
+        try:
+            self.logTag("正在下载 "+url+" 为 "+path)
+            count = 0
+            count_tmp = 0
+            time1 = time.time()
+            header = {'Proxy-Connection':'keep-alive'}
+            r = requests.get(url, stream=True, headers= header)
+            length = float(r.headers['content-length'])
+            f = open(path, 'wb')
+            for chunk in r.iter_content(chunk_size = 2048):
+                if chunk:
+                    f.write(chunk)
+                    count += len(chunk)
+                    if time.time()-time1 > 0.25:
+                        p = count / length * 100
+                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
+                        count_tmp = count
+                        self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
+                        time1 = time.time()
+                if not self.key_Keep:
+                    '''
+                    stop函数执行,下载终止。
+                    '''
+                    break
+            f.close()
+            return True
+        except TimeoutError:
+            self.__changeStatusByTag(tag,'超时',path)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
+            return False
+        except:
+            self.__changeStatusByTag(tag,'其他错误',path)
+            self.logTag("Error<<downLoad()>> -path:"+path+"-url:"+url)  
+            return False
         
     def downLoad_LSize(self,url,path,tag,start,end):
         '''
