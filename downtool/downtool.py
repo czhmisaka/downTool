@@ -99,6 +99,7 @@ class down():
         self.key_Keep = True 
         self.lock = threading.Lock()
         self.log = False
+        self.log_taskStatus = True 
         self.tick = 0.5
         self.timeOut = 4
         self.reDownMax = 10
@@ -127,7 +128,8 @@ class down():
             status = {
                 'tag':x,
                 'now':'wait',
-                'goal':''
+                'goal':'',
+                'speed':'0MB/s'
             }
             self.status.append(status)
         for x in self.threadList:
@@ -152,16 +154,35 @@ class down():
             self.clearShellinWin()
             print('当前状态:',end=' : ')
             print(self.helper)
-            print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
+            print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey),end='  [ 当前下载总速：')
+            print(self.speed(),end=' ] \n')
+            print("[ 当前工作线程数： "+self.activeThread()+' ]')
             if self.log:
                 for i in range(len(self.threadList)):
                     print(i,end=' : ')
                     print(self.threadList[i])
-            for x in range(len(self.status)):
-                print('线程<'+str(x)+'>',end=' : ')
-                print(self.status[x]) 
+            if self.log_taskStatus:
+                for x in range(len(self.status)):
+                    print('线程<'+str(x)+'>',end=' : ')
+                    print(self.status[x])
             time.sleep(self.tick)
-            
+
+    def activeThread(self):
+        num = 0
+        for x in self.status:
+            if x['now']=='正在下载':
+                num = num + 1
+        return str(num)
+
+    def speed(self):
+        speed = 0
+        for x in self.status:
+            case=x['speed'].split('MB/s')
+            if(case[0]):
+                speed = speed + float(case[0])
+        speed = round(speed,3)
+        return ' '+str(speed) +' MB/s'
+
     def workProcess_create(self,threadStatus):
         '''
         创建工作进程/下载
@@ -207,7 +228,7 @@ class down():
                 elif deal['isLarge']==True:
                     self.addMission(deal['url'],path = deal['path'],fileName=deal['fileName'],reDown=deal['reDown']+1,isLarge = deal['isLarge'])
 
-    def __changeStatusByTag(self,tag,status_tag1,status_tag2,status_speed='无',status_process =' '):
+    def __changeStatusByTag(self,tag,status_tag1,status_tag2,status_speed='0MB/s',status_process =' '):
         '''
         修改进程状态
         '''
