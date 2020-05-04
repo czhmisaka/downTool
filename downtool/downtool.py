@@ -155,7 +155,7 @@ class down():
             print('当前状态:',end=' : ')
             print(self.helper)
             print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
-            print("[ 当前任务进度: "+str(round(self.taskKey/self.taskNum*100,3))+'% ]')
+            print("[ 当前任务进度: "+self.taskState()+' % ]')
             print("[ 当前下载总速: "+self.speed()+' ]')
             print("[ 当前工作线程利用率: "+self.activeThread()+' ]')
             if self.log:
@@ -168,14 +168,38 @@ class down():
                     print(self.status[x])
             time.sleep(self.tick)
 
+    def taskState(self):
+        if self.taskNum == 0:
+            return '0';
+        else:
+            state = self.taskKey
+            for x in self.status:
+                if len(x['rate'])>=2:
+                    if x['now']=='正在下载':
+                        state = state - (1 - int(x['rate'].split('%')[0])/100)
+                else:
+                    if x['now']=='等待任务':
+                        pass
+                    else:        
+                        state = state - 1
+            if state < 0 :
+                state = 0
+            return str(round(state/self.taskNum*100,3))
+
     def activeThread(self):
+        '''
+        统计线程正在工作的占比
+        '''
         num = 0
         for x in self.status:
-            if x['now']=='正在下载':
+            if x['now']!='等待任务':
                 num = num + 1
         return str(round(num/len(self.status)*100,3))+' %'
 
     def speed(self):
+        '''
+        统计所有线程的下载速度
+        '''
         speed = 0
         for x in self.status:
             case=x['speed'].split('MB/s')
@@ -322,8 +346,8 @@ class down():
                     self.taskNum = len(self.taskList)
             else:
                 if path == '':
-                    self.logTag("error : 任务添加失败 reDown:"+str(reDown)+' url: '+url+' path: '+path)
-                    return False
+                    fileName = url.split('/')[len(url.split('/'))-1]
+                    path = self.path+fileName
                 if reDown<self.reDownMax:
                     path = str(path)
                     url = str(url)
@@ -378,7 +402,7 @@ class down():
             r = requests.get(url, stream=True, headers= header)
             length = float(r.headers['content-length'])
             f = open(path, 'wb')
-            for chunk in r.iter_content(chunk_size = 2048):
+            for chunk in r.iter_content(chunk_size = self.chunk_size):
                 if chunk:
                     f.write(chunk)
                     count += len(chunk)
@@ -428,7 +452,6 @@ class down():
                     F_start += len(chunk)
                     count += len(chunk)
                     if time.time()-time1 > 0.25:
-                        p = count / length * 100
                         speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
                         count_tmp = count
                         self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
