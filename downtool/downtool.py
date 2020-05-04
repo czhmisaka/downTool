@@ -76,6 +76,8 @@ class down():
         key_Keep    : bool/设置为False停止创建新的下载进程
         lock        : 进程锁/目前还没有什么用 
         log         : 错误输出控制
+        log_taskStatus：任务状态显示控制
+        cmdShow     : cmd界面显示控制
         tick        : 状态更新间隔
         timeOut     : 超时时间
         reDownMax   : 最大重复下载次数
@@ -100,6 +102,7 @@ class down():
         self.lock = threading.Lock()
         self.log = False
         self.log_taskStatus = True 
+        self.cmdShow = True
         self.tick = 0.5
         self.timeOut = 4
         self.reDownMax = 10
@@ -134,8 +137,9 @@ class down():
             self.status.append(status)
         for x in self.threadList:
             self.workProcess_create(x)
-        self.helper = _downTool_commonThread(self.statusPrint,(),'0') 
-        self.helper.start()
+        if self.cmdShow:
+            self.helper = _downTool_commonThread(self.statusPrint,(),'0') 
+            self.helper.start()
 
     def stop(self):
         '''
@@ -152,8 +156,8 @@ class down():
         '''
         while(self.key_Keep):
             self.clearShellinWin()
-            print('当前状态:',end=' : ')
-            print(self.helper)
+            # print('当前状态:',end=' : ')
+            # print(self.helper)
             print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
             print("[ 当前任务进度: "+self.taskState()+' % ]')
             print("[ 当前下载总速: "+self.speed()+' ]')
@@ -451,8 +455,8 @@ class down():
                     self.lock.release()
                     F_start += len(chunk)
                     count += len(chunk)
-                    if time.time()-time1 > 0.25:
-                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 0.25)
+                    if time.time()-time1 > 1:
+                        speed = self.__formatFloat((count - count_tmp) / 1024 / 1024 / 1)
                         count_tmp = count
                         self.__changeStatusByTag(tag,'正在下载',path,str(speed)+'MB/s',str(int(count/length*100))+'%')
                         time1 = time.time()
