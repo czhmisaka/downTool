@@ -30,12 +30,12 @@ a.chunk_size = 1024
 # a.addMission('http://mac.yxdownload.com/bmc/CivilizationVI.zip',fileName='1.zip',path='',isLarge=True)
 # 添加了一个分块下载的任务
 # 其中path 为选填项，若填写则按照这里的path去写入文件
-a.threadMaxNum = 50
+a.threadMaxNum = 500
 # 控制线程数量
 a.start()
 # 下载器启动
 time.sleep(3)
-for x in range(200):
+for x in range(2000):
     a.addMission('http://www.4kmee.com/wp-content/uploads/2020/02/4K-60fps视频-徒步在英国伯明翰-2.jpg',path=a.path+str(x)+'.jpg',isLarge=False)
 num = 0
 while num<60:

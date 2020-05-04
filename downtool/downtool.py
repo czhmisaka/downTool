@@ -161,7 +161,8 @@ class down():
             print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
             print("[ 当前任务进度: "+self.taskState()+' % ]')
             print("[ 当前下载总速: "+self.speed()+' ]')
-            print("[ 当前工作线程利用率: "+self.activeThread()+' ]')
+            print("[ 当前工作线程利用率: "+self.activeThread()[0]+' ]')
+            print("[ 当前正在下载的线程: "+self.activeThread()[1]+' ]')
             if self.log:
                 for i in range(len(self.threadList)):
                     print(i,end=' : ')
@@ -195,10 +196,13 @@ class down():
         统计线程正在工作的占比
         '''
         num = 0
+        num1 = 0
         for x in self.status:
+            if x['now']=="正在下载":
+                num1 = num1+1
             if x['now']!='等待任务':
                 num = num + 1
-        return str(round(num/len(self.status)*100,3))+' %'
+        return [str(round(num/len(self.status)*100,3))+' %',str(round(num1/len(self.status)*100,3))+' %']
 
     def speed(self):
         '''
