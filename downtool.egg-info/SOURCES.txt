@@ -3,6 +3,7 @@ setup.py
 downtool/__init__.py
 downtool/api.py
 downtool/downtool.py
+downtool/gui.py
 downtool/test.py
 downtool.egg-info/PKG-INFO
 downtool.egg-info/SOURCES.txt
