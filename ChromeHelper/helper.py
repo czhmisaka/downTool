@@ -16,7 +16,6 @@ def getDesktopPath():
     return os.path.join(os.path.expanduser('~'),"Desktop")+'/'
 
 
-# 知乎有反爬虫，加入http headers伪装浏览器
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
     "Connection": "keep-alive",
@@ -25,14 +24,13 @@ headers = {
 
 # 知乎问题id
 question_id = input('问题 id >')
-# question_id = 357428264
 interval = 20
 offset = 0
 rank = 100
 novels_count = dict()
 
 
-p = re.compile(r'<p>.+?</p>') # 正则匹配被《》括起来的书名
+p = re.compile(r'<p>.+?</p>')
 data = []
 while True:
     print(f'答案数 {offset} 到 {offset + interval}')
@@ -58,6 +56,5 @@ while True:
     # if offset>500:
     #     break
 
-# print(data)
 saveHistory(data)
 
