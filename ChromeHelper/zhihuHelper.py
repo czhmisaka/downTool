@@ -5,7 +5,7 @@ import json
 import time
 
 def saveHistory(data):
-    with open(getDesktopPath()+'History.txt','w',encoding='utf-8') as f:
+    with open('History.txt','w',encoding='utf-8') as f:
         for x in data:
             f.write(x+'\n')
 
