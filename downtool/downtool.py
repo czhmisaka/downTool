@@ -128,13 +128,14 @@ class down():
                 'thread':''
             }
             self.threadList.append(status)
-            status = {
+            Astatus = {
                 'tag':x,
                 'now':'wait',
                 'goal':'',
-                'speed':'0MB/s'
+                'speed':'0MB/s',
+                'rate':''
             }
-            self.status.append(status)
+            self.status.append(Astatus)
         for x in self.threadList:
             self.workProcess_create(x)
         if self.cmdShow:
@@ -175,7 +176,7 @@ class down():
 
     def taskState(self):
         if self.taskNum == 0:
-            return '0';
+            return '0'
         else:
             state = self.taskKey
             for x in self.status:
