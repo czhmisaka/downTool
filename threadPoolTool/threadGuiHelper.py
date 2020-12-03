@@ -2,7 +2,6 @@ import threading
 import os
 import json
 import time
-import pygame as pg
 
 
 
@@ -20,4 +19,4 @@ class threadGuiHelper:
         
         
     def start(self):        
-    
+        print(1)

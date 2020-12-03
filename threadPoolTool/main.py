@@ -91,6 +91,7 @@ class normalThread(threading.Thread):
     公共线程类 - 通用线程
     '''
     def __init__(self,func,args,name):
+        threading.Thread.__init__(self)
         self.func = func
         self.args = args
         self.name = name
