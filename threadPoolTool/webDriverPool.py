@@ -18,6 +18,8 @@ class ChromeDriverHelper:
     def __init__(self):
         '''
         用于模拟浏览器进行爬虫操作
+        目前是单线程处理，如需多线程需要配合其他库一同使用
+        
         变量说明：
 
         model               : 工作模式 work dev test
@@ -57,12 +59,7 @@ class ChromeDriverHelper:
     def getSoup(self,url,asd):
         '''
         通过url获取对应soup快捷方式
-        此处本意是为了规避多次创建driver造成性能损耗，不过目前未检测（留个坑）
         '''
-        # if self.driverStatus == True:
-        #     return self.__getSoupFunc(url)
-        # else:
-        print(asd)
         self.start()
         return self.__getSoupFunc(url)
             
@@ -104,7 +101,6 @@ class ChromeDriverHelper:
 #     lists.append({})
 # for x in range(10):
 #     helper = ChromeDriverHelper()
-#     lists[x]= Nt(helper.getSoup,(url,"asd"),1)
-#     print(x)
+#     lists[x] =  Nt(helper.getSoup,(url,"asd"),1)
 # for x in lists:
 #     x.run()
