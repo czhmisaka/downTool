@@ -355,7 +355,8 @@ class down():
                     self.taskNum = len(self.taskList)
             else:
                 if path == '':
-                    fileName = url.split('/')[len(url.split('/'))-1]
+                    if fileName == "":
+                        fileName = url.split('/')[len(url.split('/'))-1]
                     path = self.path+fileName
                 if reDown<self.reDownMax:
                     path = str(path)

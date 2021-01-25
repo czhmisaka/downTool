@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.3.0'
 __author__ = 'czh&xcb'
 
 from .downtool import down
