@@ -157,8 +157,6 @@ class down():
         '''
         while(self.key_Keep):
             self.clearShellinWin()
-            # print('当前状态:',end=' : ')
-            # print(self.helper)
             print('任务总量:'+str(self.taskNum)+'||当前指针：'+str(self.taskKey))
             print("[ 当前任务进度: "+self.taskState()+' % ]')
             print("[ 当前下载总速: "+self.speed()+' ]')
