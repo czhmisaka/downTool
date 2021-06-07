@@ -29,9 +29,12 @@ a.tick = 0.25
 # 终端显示程序的刷新间隔 单位（s）
 a.block_size = 1024*102400
 a.chunk_size = 10240
+url = 'https://c-ssl.duitang.com/uploads/blog/202103/23/20210323213302_9d839.jpg'
+# url = 'https://sh-download.weiyun.com/ftn_handler/86fed10887362dade2a4dc9b329a1d40efdcf415f83c40057a2b433c936a24204460bb0aceaeeaee8be69e3e3d6dfbfdb447ca3698f6eecc728b294ce087ae6c/%E4%BF%AE%E5%A4%8D032601.7z?fname=%E4%BF%AE%E5%A4%8D032601.7z&from=30113&version=3.3.3.3'
+a.addMission(url,fileName='sao.7z',isLarge=True)
 # 设置分块下载时的区块大小
-for x in range(10000):
-    a.addMission('https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',fileName=str(x)+'.jpg',isLarge=False)
+# for x in range(10000):
+#     a.addMission('https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',fileName=str(x)+'.jpg',isLarge=False)
 a.threadMaxNum = 1000
 a.start()
 

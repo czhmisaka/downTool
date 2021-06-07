@@ -61,7 +61,8 @@ class down():
         
 
         --变量说明--
-
+        stopWhenFinish: 字面意思，停机用的
+        proxy       : VPN 转发用
         header      : header(如果需要的话，这个目前还没有用上)
         status      : 线程状态-list
         helper      : 守护线程-thread
@@ -89,6 +90,7 @@ class down():
         --变量说明--
         '''
         self.stopWhenFinish = True
+        self.proxy = {'https':'https://127.0.0.1:19180'}
         self.header = []
         self.status = []
         self.helper = {}
@@ -407,7 +409,7 @@ class down():
             count_tmp = 0
             time1 = time.time()
             header = {'Proxy-Connection':'keep-alive'}
-            r = requests.get(url, stream=True, headers= header)
+            r = requests.get(url, stream=True, headers= header,proxies=self.proxy)
             length = float(r.headers['content-length'])
             f = open(path, 'wb')
             for chunk in r.iter_content(chunk_size = self.chunk_size):
@@ -443,7 +445,7 @@ class down():
         '''
         try:
             header = {'Proxy-Connection':'keep-alive','range':'bytes='+ str(start) +'-'+ str(end)}
-            r = requests.get(url, stream=True, headers = header)
+            r = requests.get(url, stream=True, headers = header,proxies=self.proxy)
             length = float(r.headers['content-length'])
             count = 0
             count_tmp = 0
@@ -530,7 +532,7 @@ class down():
         获取待下载文件的大小
         返回按照区块（self.block_size）划分的列表
         '''
-        r1 = requests.get(url, stream=True, verify=False)
+        r1 = requests.get(url, stream=True, verify=False,proxies=self.proxy)
         size = int(r1.headers['Content-Length'])
         i = 0
         sizeList = []
