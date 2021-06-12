@@ -62,7 +62,7 @@ class down():
 
         --变量说明--
         stopWhenFinish: 字面意思，停机用的
-        proxy       : VPN 转发用
+        proxy       : VPN 转发用 (例如 {'https':'https://127.0.0.1:19180'})
         header      : header(如果需要的话，这个目前还没有用上)
         status      : 线程状态-list
         helper      : 守护线程-thread
@@ -90,7 +90,7 @@ class down():
         --变量说明--
         '''
         self.stopWhenFinish = True
-        self.proxy = {'https':'https://127.0.0.1:19180'}
+        self.proxy  = {}
         self.header = []
         self.status = []
         self.helper = {}
